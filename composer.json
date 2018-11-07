@@ -1,0 +1,27 @@
+{
+  "name": "chomenko/ExtraForm",
+  "type": "extensions",
+  "description": "",
+  "keywords": ["From", "Bootstrap", "Bootstrap 4"],
+  "homepage": "https://github.com/chomenko/ExtraForm",
+  "license": [],
+  "authors": [
+    {
+      "name": "Mykola Chomenko",
+      "homepage": "http://dipcom.cz",
+      "email": "mykola.chomenko@dipcom.cz"
+    }
+  ],
+  "support": {
+    "email": "mykola.chomenko@dipcom.cz"
+  },
+  "require": {
+    "php": "^5.6",
+    "nette/forms": "^2.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Chomenko\\ExtraForm\\": "src/"
+    }
+  }
+}
