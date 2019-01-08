@@ -8,13 +8,23 @@
 namespace Chomenko\ExtraForm\Controls;
 
 use Chomenko\ExtraForm\Builds\HtmlUtility;
+use Chomenko\ExtraForm\Events\Listener;
 
-class Checkbox extends \Nette\Forms\Controls\Checkbox
+class Checkbox extends \Nette\Forms\Controls\Checkbox implements FormElement
 {
 
     use Traits\Extend;
 
-    /**
+	/**
+	 * @param null $label
+	 */
+    public function __construct($label = NULL)
+	{
+		$this->evenListener = new Listener();
+		parent::__construct($label);
+	}
+
+	/**
      * @return \Nette\Utils\Html
      */
     public function getControl()
@@ -24,6 +34,5 @@ class Checkbox extends \Nette\Forms\Controls\Checkbox
         HtmlUtility::addClass($el->getChildren()[0], 'form-check-input');
         return $el;
     }
-
 
 }

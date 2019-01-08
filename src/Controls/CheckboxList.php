@@ -7,10 +7,23 @@
 
 namespace Chomenko\ExtraForm\Controls;
 
-class CheckboxList extends \Nette\Forms\Controls\CheckboxList
+use Chomenko\ExtraForm\Events\Listener;
+
+class CheckboxList extends \Nette\Forms\Controls\CheckboxList implements FormElement
 {
 
     use Traits\Extend;
     use Traits\Check;
+	use Traits\Choice;
+
+	/**
+	 * @param null $label
+	 * @param array|NULL $items
+	 */
+	public function __construct($label = NULL, array $items = NULL)
+	{
+		$this->evenListener = new Listener();
+		parent::__construct($label, $items);
+	}
 
 }

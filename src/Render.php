@@ -7,7 +7,7 @@
 
 namespace Chomenko\ExtraForm;
 
-
+use Chomenko\ExtraForm\Events\Listener;
 use Nette\Forms\Form;
 use Nette\Forms\IFormRenderer;
 use Nette\Utils\Html;
@@ -29,14 +29,15 @@ class Render implements IFormRenderer
      */
     protected $used_items = array();
 
-
+	/**
+	 * @param Form $form
+	 */
     public function __construct(Form $form)
     {
         $this->form = $form;
         $this->builder = new Builder($this);
         $this->builder->__setReference('#form');
     }
-
 
     /**
      * @param string $message
@@ -51,15 +52,12 @@ class Render implements IFormRenderer
         return $message;
     }
 
-
-
     /**
      * @return Builder
      */
     public function builder(){
         return $this->builder;
     }
-
 
     /**
      * @param Form $form
@@ -68,7 +66,12 @@ class Render implements IFormRenderer
     public function render(Form $form)
     {
         $this->form = $form;
+
         $form_html = $form->getElementPrototype();
+
+		if ($form instanceof ExtraForm) {
+			$form->getEventsListener()->emit(ExtraForm::BEFORE_RENDER, $form_html, $this, $form);
+		}
 
         $this->resort();
 
@@ -77,6 +80,10 @@ class Render implements IFormRenderer
 
         $form_html->addHtml($errors_html);
         $form_html->addHtml($content);
+
+		if ($form instanceof ExtraForm) {
+			$form->getEventsListener()->emit(ExtraForm::AFTER_RENDER, $form_html, $this, $form);
+		}
 
         return $form_html;
     }
@@ -98,7 +105,6 @@ class Render implements IFormRenderer
         return $html;
     }
 
-
     protected function resort(){
         $sorted = array();
         foreach($this->form->getComponents() as $name => $component){
@@ -110,7 +116,6 @@ class Render implements IFormRenderer
         }
         $this->builder->setChild($sorted);
     }
-
 
     /**
      * @param $components

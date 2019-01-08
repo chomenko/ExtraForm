@@ -8,14 +8,25 @@
 namespace Chomenko\ExtraForm\Controls;
 
 use Chomenko\ExtraForm\Builds\HtmlUtility;
+use Chomenko\ExtraForm\Events\Listener;
 
-class TextInput extends \Nette\Forms\Controls\TextInput
+class TextInput extends \Nette\Forms\Controls\TextInput implements FormElement
 {
 
     use Traits\Extend;
     use Traits\SizeInputs;
 
-    /**
+	/**
+	 * @param null $label
+	 * @param null $maxLength
+	 */
+    public function __construct($label = NULL, $maxLength = NULL)
+	{
+		$this->evenListener = new Listener();
+		parent::__construct($label, $maxLength);
+	}
+
+	/**
      * @return \Nette\Utils\Html
      */
     public function getControl()
@@ -32,6 +43,5 @@ class TextInput extends \Nette\Forms\Controls\TextInput
         HtmlUtility::addClass($el, $class);
         return $el;
     }
-
 
 }

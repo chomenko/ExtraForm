@@ -8,7 +8,7 @@
 namespace Chomenko\ExtraForm\Builds;
 
 use Chomenko\ExtraForm\Builder;
-use Chomenko\ExtraForm\Exception\BuildException;
+use Chomenko\ExtraForm\Exception\Exception;
 use Chomenko\ExtraForm\Render;
 use Nette\Forms\Form;
 use Nette\Utils\Html;
@@ -90,6 +90,7 @@ abstract class Make
     /**
      * @param Form $form
      * @return Html
+	 * @internal
      */
     public function make(Form $form)
     {
@@ -119,16 +120,17 @@ abstract class Make
         return $this->item_wrapped ? $wrapped->addHtml($item_wrapped) : $item_wrapped;
     }
 
-    /**
-     * @param string|array $name
-     */
+	/**
+	 * @param string|array $name
+	 * @throws Exception
+	 */
     public function addItem($name)
     {
         if(empty($name)){
             return;
         }
         if(!is_string($name) && !is_array($name) && !$name instanceof Make && !$name instanceof Html){
-            BuildException::AddItemFailed();
+            throw Exception::AddItemFailed();
         }
         if(is_array($name)){
             $this->__setReference(array_values($name)[0]);

@@ -7,12 +7,12 @@
 
 namespace Chomenko\ExtraForm\Controls;
 
-
+use Chomenko\ExtraForm\Events\Listener;
 use Nette\Utils\Html;
 
 use Chomenko\ExtraForm\Builds\HtmlUtility;
 
-class UploadControl extends \Nette\Forms\Controls\UploadControl
+class UploadControl extends \Nette\Forms\Controls\UploadControl implements FormElement
 {
     use Traits\Extend;
 
@@ -26,7 +26,17 @@ class UploadControl extends \Nette\Forms\Controls\UploadControl
      */
     protected $input_caption;
 
-    /**
+	/**
+	 * @param null $label
+	 * @param bool $multiple
+	 */
+    public function __construct($label = NULL, bool $multiple = FALSE)
+	{
+		$this->evenListener = new Listener();
+		parent::__construct($label, $multiple);
+	}
+
+	/**
      * @param string|null|Html $caption
      * @param boolean $custom
      * @return $this
@@ -37,7 +47,6 @@ class UploadControl extends \Nette\Forms\Controls\UploadControl
         $this->custom = $custom;
         return $this;
     }
-
 
     /**
      * @return bool

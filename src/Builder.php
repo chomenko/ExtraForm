@@ -28,7 +28,7 @@ class Builder extends Make
     {
 
         $wrapped = Html::el('div', array('class' => 'form-group'));
-        $item_to = Html::el('div', array('class'=>'input-group'));
+        $item_to = Html::el('div', array('class' => 'input-group'));
 
         if($label){
             $wrapped->addHtml(Html::el('label')->setHtml($this->render->translate($label)));
