@@ -9,11 +9,8 @@ namespace Chomenko\ExtraForm;
 
 use Chomenko\ExtraForm\Controls\ControlEvents;
 use Chomenko\ExtraForm\Controls\FormElement;
-use Chomenko\ExtraForm\Events\IFormEvent;
 use Chomenko\ExtraForm\Extend\ExtendValue;
 use Chomenko\ExtraForm\Extend\IEntityExtend;
-use Chomenko\ExtraForm\Extend\Pair\DateEvent;
-use Chomenko\ExtraForm\Extend\Pair\PairEvent;
 use Chomenko\ExtraForm\Extend\Pair\Pairs;
 use Chomenko\ExtraForm\Exception\Exception;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -76,15 +73,7 @@ class EntityForm extends ExtraForm
 	private $validator;
 
 	/**
-	 * @var array
-	 */
-	private $extends = [
-		PairEvent::class,
-		DateEvent::class
-	];
-
-	/**
-	 * @param $entity
+	 * @param string|object $entity
 	 * @param EntityManager $entityManager
 	 * @param FormEvents $formEvents
 	 * @throws \Exception
@@ -97,13 +86,6 @@ class EntityForm extends ExtraForm
 		$this->annotationReader = new AnnotationReader();
 		$this->validator = Validation::createValidator();
 		$this->identifier = $this->installEntity($entity);
-
-		foreach ($this->extends as $class)
-		{
-			/** @var IFormEvent $event */
-			$event = new $class();
-			$event->install($this, $this->eventsListener);
-		}
 	}
 
 	/**

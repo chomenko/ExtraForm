@@ -5,7 +5,7 @@
  * Created: 05.01.2019
  */
 
-namespace Chomenko\ExtraForm\Extend\Pair;
+namespace Chomenko\ExtraForm\Extend\Date;
 
 use Chomenko\ExtraForm\Events\IFormEvent;
 use Chomenko\ExtraForm\EntityForm;
@@ -32,7 +32,9 @@ class DateEvent implements IFormEvent
 	 */
 	public function install(ExtraForm $form, Listener $listener)
 	{
-		$listener->create(EntityForm::BEFORE_ADD_COMPONENT, [$this, "addComponent"]);
+		if ($form instanceof EntityForm) {
+			$listener->create(EntityForm::BEFORE_ADD_COMPONENT, [$this, "addComponent"]);
+		}
 	}
 
 	/**

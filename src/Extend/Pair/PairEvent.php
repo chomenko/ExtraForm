@@ -28,7 +28,9 @@ class PairEvent implements IFormEvent
 	 */
 	public function install(ExtraForm $form, Listener $listener)
 	{
-		$listener->create(EntityForm::BEFORE_ADD_COMPONENT, [$this, "addComponent"]);
+		if ($form instanceof EntityForm) {
+			$listener->create(EntityForm::BEFORE_ADD_COMPONENT, [$this, "addComponent"]);
+		}
 	}
 
 	/**

@@ -7,6 +7,8 @@
 
 namespace Chomenko\ExtraForm\DI;
 
+use Chomenko\ExtraForm\Extend\Date\DateEvent;
+use Chomenko\ExtraForm\Extend\Pair\PairEvent;
 use Chomenko\ExtraForm\FormEvents;
 use Chomenko\ExtraForm\FormFactory;
 use Nette\Configurator;
@@ -18,12 +20,24 @@ class ExtraFormExtension extends CompilerExtension
 
 	const TAG_EVENT = 'extraForm.events';
 
+	/**
+	 * @var array
+	 */
+	private $defaultEvents = [
+		PairEvent::class,
+		DateEvent::class
+	];
+
     public function loadConfiguration()
     {
         $builder = $this->getContainerBuilder();
 
-        $builder->addDefinition($this->prefix("FormEvents"))
+        $events = $builder->addDefinition($this->prefix("FormEvents"))
             ->setFactory(FormEvents::class);
+
+        foreach ($this->defaultEvents as $class) {
+			$events->addSetup("addEvent", [new $class()]);
+		}
 
 		$builder->addDefinition($this->prefix("FormFactory"))
 			->setFactory(FormFactory::class);
@@ -35,7 +49,7 @@ class ExtraFormExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$event = $builder->getDefinition($this->prefix("FormEvents"));
 		foreach ($builder->findByTag(self::TAG_EVENT) as $name => $item) {
-			$event->addSetup("add", [$builder->getDefinition($name)]);
+			$event->addSetup("addEvent", [$builder->getDefinition($name)]);
 		}
 	}
 
