@@ -37,7 +37,7 @@ If you do not use [auto-install](https://github.com/chomenko/AutoInstall).
 services:
 	SimpleEvent:
 		class: Examples\SimpleEvent\Event
-		tags: ["modal.factory"]
+		tags: ["extraForm.events"]
 ````
 
 **Form events**
