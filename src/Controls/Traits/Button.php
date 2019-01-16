@@ -197,7 +197,9 @@ trait Button
             $class[] = "btn-block";
         }
 
-        HtmlUtility::addClass($el, $class);
+        if (!$el->getAttribute("class")) {
+        	HtmlUtility::addClass($el, $class);
+        }
 
         foreach ($this->before_icons as $attr_class){
             $el->addHtml(Html::el('i')->setAttribute('class', $attr_class));

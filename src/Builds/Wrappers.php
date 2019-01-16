@@ -118,9 +118,6 @@ trait Wrappers
         $wrapper = Html::el("div", array(
             'class' => 'form-check'
         ));
-        if($label = $component->getLabel()) {
-            $wrapper->addHtml($component->getLabel());
-        }
         $wrapper->addHtml($component->getControl());
         return Html::el('div', array('class' => 'form-group'))->setHtml($wrapper);
     }
