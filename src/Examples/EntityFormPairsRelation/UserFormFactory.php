@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 08.01.2019
  */
 
 namespace Examples\EntityFormPairsRelation;

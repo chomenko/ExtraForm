@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 01.06.2018 18:34
  */
 
 namespace Chomenko\ExtraForm\Controls;
@@ -13,8 +12,8 @@ use Chomenko\ExtraForm\Events\Listener;
 class SelectBox extends \Nette\Forms\Controls\SelectBox implements FormElement
 {
 
-    use Traits\Extend;
-    use Traits\SizeInputs;
+	use Traits\Extend;
+	use Traits\SizeInputs;
 	use Traits\Choice;
 
 	/**
@@ -28,21 +27,21 @@ class SelectBox extends \Nette\Forms\Controls\SelectBox implements FormElement
 	}
 
 	/**
-     * @return \Nette\Utils\Html
-     */
-    public function getControl()
-    {
-        $el = parent::getControl();
-        $this->setErrorClass($el);
-        $class = array();
-        $class[] = 'form-control';
+	 * @return \Nette\Utils\Html
+	 */
+	public function getControl()
+	{
+		$el = parent::getControl();
+		$this->setErrorClass($el);
+		$class = [];
+		$class[] = 'form-control';
 
-        if($this->input_size){
-            $class[] = $this->input_size;
-        }
+		if ($this->inputSize) {
+			$class[] = $this->inputSize;
+		}
 
-        HtmlUtility::addClass($el, $class);
-        return $el;
-    }
+		HtmlUtility::addClass($el, $class);
+		return $el;
+	}
 
 }

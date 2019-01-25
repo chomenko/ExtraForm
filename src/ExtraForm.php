@@ -2,16 +2,17 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 01.06.2018 17:19
  */
 
 namespace Chomenko\ExtraForm;
 
 use Chomenko\ExtraForm\Events\IFormEvent;
 use Chomenko\ExtraForm\Events\Listener;
+use Nette\ComponentModel\Component;
 use Nette\ComponentModel\IComponent;
 use Nette\ComponentModel\IContainer;
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\BaseControl;
 
 /**
  * Class ExtraForm
@@ -27,28 +28,33 @@ class ExtraForm extends Form
 	const BEFORE_RENDER = "beforeRender";
 	const AFTER_RENDER = "afterRender";
 
-    /**
-     * @var Builder
-     */
-    protected $builder;
+	/**
+	 * @var Builder
+	 */
+	protected $builder;
 
 	/**
 	 * @var Listener
 	 */
-    protected $eventsListener;
+	protected $eventsListener;
 
 	/**
-	 * @param IContainer|NULL $parent
-	 * @param null $name
-	 * @param FormEvents|NULL $formEvents
+	 * @var string|null
 	 */
-    public function __construct(IContainer $parent = null, $name = null, FormEvents $formEvents = null)
-    {
-    	$this->eventsListener = new Listener();
-        parent::__construct($parent, $name);
+	private $translateFile;
 
-        if ($formEvents) {
-        	foreach ($formEvents->getEvents() as $event) {
+	/**
+	 * @param IContainer|null $parent
+	 * @param string|null $name
+	 * @param FormEvents|null $formEvents
+	 */
+	public function __construct(IContainer $parent = NULL, $name = NULL, FormEvents $formEvents = NULL)
+	{
+		$this->eventsListener = new Listener();
+		parent::__construct($parent, $name);
+
+		if ($formEvents) {
+			foreach ($formEvents->getEvents() as $event) {
 				if (!$event instanceof IFormEvent) {
 					continue;
 				}
@@ -56,11 +62,27 @@ class ExtraForm extends Form
 			}
 		}
 
-        $render = new Render($this);
-        $this->builder = $render->builder();
-        $this->setRenderer($render);
+		$render = new Render($this);
+		$this->builder = $render->builder();
+		$this->setRenderer($render);
 		$this->eventsListener->emit(self::CRETE_FORM, $this);
-    }
+	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getTranslateFile(): ?string
+	{
+		return $this->translateFile;
+	}
+
+	/**
+	 * @param null|string $translateFile
+	 */
+	public function setTranslateFile($translateFile)
+	{
+		$this->translateFile = $translateFile;
+	}
 
 	/**
 	 * @param IComponent $component
@@ -68,7 +90,7 @@ class ExtraForm extends Form
 	 * @param null $insertBefore
 	 * @return static
 	 */
-    public function addComponent(IComponent $component, $name, $insertBefore = NULL)
+	public function addComponent(IComponent $component, $name, $insertBefore = NULL)
 	{
 		$this->eventsListener->emit(self::BEFORE_ADD_COMPONENT, $name, $component, $this);
 		$container = parent::addComponent($component, $name, $insertBefore);
@@ -85,12 +107,74 @@ class ExtraForm extends Form
 	}
 
 	/**
-     * @return Builder
-     */
-    public function builder()
-    {
-        return $this->builder;
-    }
+	 * @return Builder
+	 */
+	public function builder()
+	{
+		return $this->builder;
+	}
+
+	public function fireEvents()
+	{
+		if (!$this->isSubmitted()) {
+			return;
+
+		} elseif (!$this->getErrors()) {
+			$this->validate();
+		}
+
+		if ($this->hasOnlyValidation()) {
+			if (!$this->getPresenter()->isAjax()) {
+				return;
+			}
+			$payload = $this->getValidatePayload();
+			$this->getPresenter()->payload->forms[] = $payload;
+		}
+		parent::fireEvents();
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasOnlyValidation(): bool
+	{
+		$onlyValidation = $this->getHttpData($this::DATA_TEXT, "_validate");
+		return filter_var($onlyValidation, FILTER_VALIDATE_BOOLEAN);
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function getValidatePayload(): array
+	{
+		$payload = [
+			"name" => $this->getName(),
+			"errors" => [],
+			"fields" => [],
+		];
+
+		foreach ($this->getOwnErrors() as $error) {
+			$payload['errors'][] = (string)$error;
+		}
+
+		foreach ($this->getComponents(TRUE) as $component) {
+			if (!$component instanceof BaseControl || !$component->hasErrors()) {
+				continue;
+			}
+
+			$field = [
+				"name" => $component->getName(),
+				"htmlName" => $component->getHtmlName(),
+				"errors" => []
+			];
+
+			foreach ($component->getErrors() as $error) {
+				$field["errors"][] = (string)$error;
+			}
+			$payload['fields'][] = $field;
+		}
+		return $payload;
+	}
 
 	/**
 	 * @param string $name
@@ -99,14 +183,14 @@ class ExtraForm extends Form
 	 * @param null $maxLength
 	 * @return Controls\TextInput
 	 */
-    public function addText($name, $label = null, $cols = null, $maxLength = null)
-    {
+	public function addText($name, $label = NULL, $cols = NULL, $maxLength = NULL)
+	{
 		$component = new Controls\TextInput($label, $maxLength);
 		$component->setHtmlAttribute('size', $cols);
-    	$this->addComponent($component, $name);
+		$this->addComponent($component, $name);
 		$component->installed($this);
 		return $component;
-    }
+	}
 
 	/**
 	 * @param string $name
@@ -115,15 +199,15 @@ class ExtraForm extends Form
 	 * @param null $maxLength
 	 * @return Controls\TextInput
 	 */
-    public function addPassword($name, $label = null, $cols = null, $maxLength = null)
-    {
+	public function addPassword($name, $label = NULL, $cols = NULL, $maxLength = NULL)
+	{
 		$component = new Controls\TextInput($label, $maxLength);
 		$component->setHtmlAttribute('size', $cols);
 		$component->setHtmlType('password');
 		$this->addComponent($component, $name);
 		$component->installed($this);
-        return $component;
-    }
+		return $component;
+	}
 
 	/**
 	 * @param string $name
@@ -132,48 +216,47 @@ class ExtraForm extends Form
 	 * @param null $rows
 	 * @return Controls\TextArea
 	 */
-    public function addTextArea($name, $label = null, $cols = null, $rows = null)
-    {
+	public function addTextArea($name, $label = NULL, $cols = NULL, $rows = NULL)
+	{
 		$component = new Controls\TextArea($label);
 		$component->setHtmlAttribute('cols', $cols);
 		$component->setHtmlAttribute('rows', $rows);
 		$this->addComponent($component, $name);
 		$component->installed($this);
 		return $component;
-    }
+	}
 
-
-    /**
-     * Adds input for email.
-     * @param string $name
-     * @param null|string|object object
-     * @return Controls\TextInput
-     */
-    public function addEmail($name, $label = null)
-    {
-		$component = new Controls\TextInput($label);
-		$component->setRequired(false);
-		$component->addRule(Form::EMAIL);
-		$this->addComponent($component, $name);
-		$component->installed($this);
-		return $component;
-    }
 
 	/**
 	 * @param string $name
 	 * @param null|string|object $label
 	 * @return Controls\TextInput
 	 */
-    public function addInteger($name, $label = null)
+	public function addEmail($name, $label = NULL)
+	{
+		$component = new Controls\TextInput($label);
+		$component->setRequired(FALSE);
+		$component->addRule(Form::EMAIL);
+		$this->addComponent($component, $name);
+		$component->installed($this);
+		return $component;
+	}
+
+	/**
+	 * @param string $name
+	 * @param null|string|object $label
+	 * @return Controls\TextInput
+	 */
+	public function addInteger($name, $label = NULL)
 	{
 		$component = new Controls\TextInput($label);
 		$component->setNullable();
-		$component->setRequired(false);
+		$component->setRequired(FALSE);
 		$component->addRule(Form::INTEGER);
 		$this->addComponent($component, $name);
 		$component->installed($this);
 		return $component;
-    }
+	}
 
 	/**
 	 * @param string $name
@@ -181,39 +264,39 @@ class ExtraForm extends Form
 	 * @param bool $multiple
 	 * @return Controls\UploadControl
 	 */
-    public function addUpload($name, $label = null, $multiple = false)
-    {
+	public function addUpload($name, $label = NULL, $multiple = FALSE)
+	{
 		$component = new Controls\UploadControl($label, $multiple);
 		$this->addComponent($component, $name);
 		$component->installed($this);
 		return $component;
-    }
+	}
 
 	/**
 	 * @param string $name
 	 * @param null|string|object $label
 	 * @return Controls\UploadControl
 	 */
-    public function addMultiUpload($name, $label = null)
-    {
-		$component = new  Controls\UploadControl($label, true);
+	public function addMultiUpload($name, $label = NULL)
+	{
+		$component = new Controls\UploadControl($label, TRUE);
 		$this->addComponent($component, $name);
 		$component->installed($this);
 		return $component;
-    }
+	}
 
 	/**
 	 * @param string $name
 	 * @param null|string|object $caption
 	 * @return Controls\Checkbox
 	 */
-    public function addCheckbox($name, $caption = null)
-    {
+	public function addCheckbox($name, $caption = NULL)
+	{
 		$component = new Controls\Checkbox($caption);
 		$this->addComponent($component, $name);
 		$component->installed($this);
 		return $component;
-    }
+	}
 
 	/**
 	 * @param string $name
@@ -221,14 +304,14 @@ class ExtraForm extends Form
 	 * @param array|object $items
 	 * @return Controls\RadioList
 	 */
-    public function addRadioList($name, $label = null, $items = [])
-    {
+	public function addRadioList($name, $label = NULL, $items = [])
+	{
 		$component = new Controls\RadioList($label);
-		$this->addComponent($component, $name, null, false);
+		$this->addComponent($component, $name, NULL, FALSE);
 		$component->setItems($items);
 		$component->installed($this);
 		return $component;
-    }
+	}
 
 	/**
 	 * @param string $name
@@ -236,14 +319,14 @@ class ExtraForm extends Form
 	 * @param array|object $items
 	 * @return Controls\CheckboxList
 	 */
-    public function addCheckboxList($name, $label = null, $items = [])
-    {
+	public function addCheckboxList($name, $label = NULL, $items = [])
+	{
 		$component = new Controls\CheckboxList($label);
-		$this->addComponent($component, $name, null);
+		$this->addComponent($component, $name, NULL);
 		$component->setItems($items);
 		$component->installed($this);
 		return $component;
-    }
+	}
 
 	/**
 	 * @param string $name
@@ -252,15 +335,15 @@ class ExtraForm extends Form
 	 * @param null $size
 	 * @return Controls\SelectBox
 	 */
-    public function addSelect($name, $label = null, $items = [], $size = null)
-    {
+	public function addSelect($name, $label = NULL, $items = [], $size = NULL)
+	{
 		$component = new Controls\SelectBox($label);
-		$component->setHtmlAttribute('size', $size > 1 ? (int) $size : null);
-		$this->addComponent($component, $name, null);
+		$component->setHtmlAttribute('size', $size > 1 ? (int)$size : NULL);
+		$this->addComponent($component, $name, NULL);
 		$component->setItems($items);
 		$component->installed($this);
 		return $component;
-    }
+	}
 
 	/**
 	 * @param string $name
@@ -269,45 +352,45 @@ class ExtraForm extends Form
 	 * @param null $size
 	 * @return Controls\MultiSelectBox
 	 */
-    public function addMultiSelect($name, $label = null, $items = [], $size = null)
-    {
+	public function addMultiSelect($name, $label = NULL, $items = [], $size = NULL)
+	{
 		$component = new Controls\MultiSelectBox($label);
-		$component->setHtmlAttribute('size', $size > 1 ? (int) $size : null);
-		$this->addComponent($component, $name, null);
+		$component->setHtmlAttribute('size', $size > 1 ? (int)$size : NULL);
+		$this->addComponent($component, $name, NULL);
 		$component->setItems($items);
 		$component->installed($this);
 		return $component;
-    }
+	}
 
 	/**
 	 * @param string $name
 	 * @param null $caption
 	 * @return Controls\SubmitButton
 	 */
-    public function addSubmit($name, $caption = null)
-    {
+	public function addSubmit($name, $caption = NULL)
+	{
 		$component = new Controls\SubmitButton($caption);
-        $html = $component->getControlPrototype();
-        $html->setName('button');
+		$html = $component->getControlPrototype();
+		$html->setName('button');
 		$this->addComponent($component, $name);
 		$component->installed($this);
-        return $component;
-    }
+		return $component;
+	}
 
 	/**
 	 * @param string $name
 	 * @param null|string|object $caption
 	 * @return Controls\Button
 	 */
-    public function addButton($name, $caption = null)
-    {
+	public function addButton($name, $caption = NULL)
+	{
 		$component = new Controls\Button($caption);
-        $html = $component->getControlPrototype();
-        $html->setName('button');
+		$html = $component->getControlPrototype();
+		$html->setName('button');
 		$this->addComponent($component, $name);
 		$component->installed($this);
-        return  $component;
-    }
+		return $component;
+	}
 
 	/**
 	 * @param string $name
@@ -315,25 +398,25 @@ class ExtraForm extends Form
 	 * @param null $alt
 	 * @return Controls\ImageButton
 	 */
-    public function addImage($name, $src = null, $alt = null)
-    {
+	public function addImage($name, $src = NULL, $alt = NULL)
+	{
 		$component = new Controls\ImageButton($src, $alt);
 		$this->addComponent($component, $name);
 		$component->installed($this);
-		return  $component;
-    }
+		return $component;
+	}
 
 	/**
-	 * @param $name
+	 * @param string $name
 	 * @param null $default
 	 * @return Controls\HiddenField
 	 */
-    public function addHidden($name, $default = NULL)
+	public function addHidden($name, $default = NULL)
 	{
 		$component = new Controls\HiddenField($name, $default);
 		$this->addComponent($component, $name);
 		$component->installed($this);
-		return  $component;
+		return $component;
 	}
 
 }

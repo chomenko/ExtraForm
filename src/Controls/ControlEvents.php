@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 02.01.2019
  */
 
 namespace Chomenko\ExtraForm\Controls;

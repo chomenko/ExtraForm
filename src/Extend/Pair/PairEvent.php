@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 05.01.2019
  */
 
 namespace Chomenko\ExtraForm\Extend\Pair;
@@ -45,17 +44,15 @@ class PairEvent implements IFormEvent
 			return;
 		}
 		$listener = $component->getListener();
-		if($component instanceof ChoiceControl || $component instanceof MultiChoiceControl) {
+		if ($component instanceof ChoiceControl || $component instanceof MultiChoiceControl) {
 			$listener->create(ControlEvents::SET_ITEMS, [$this, "setPairItems"]);
 			$listener->create(ControlEvents::SET_VALUE, [$this, "setPairValue"]);
 		}
 	}
 
 	/**
-	 * CONTROL EVENT
 	 * @param BaseControl $component
-	 * @param $items
-	 * @throws \Chomenko\ExtraForm\Exception\Exception
+	 * @param array $items
 	 */
 	public function setPairItems(BaseControl $component, &$items)
 	{

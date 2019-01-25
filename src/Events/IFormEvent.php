@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 05.01.2019
  */
 
 namespace Chomenko\ExtraForm\Events;
@@ -18,6 +17,5 @@ interface IFormEvent
 	 * @return mixed
 	 */
 	public function install(ExtraForm $form, Listener $listener);
-
 
 }

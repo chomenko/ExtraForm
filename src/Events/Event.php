@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 27.12.2018
  */
 
 namespace Chomenko\ExtraForm\Events;
@@ -20,7 +19,10 @@ class Event
 	 */
 	private $callable;
 
-
+	/**
+	 * @param string $type
+	 * @param callable $callable
+	 */
 	public function __construct(string $type, callable $callable)
 	{
 		$this->type = $type;

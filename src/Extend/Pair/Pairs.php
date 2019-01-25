@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 20.12.2018
  */
 
 namespace Chomenko\ExtraForm\Extend\Pair;
@@ -76,7 +75,7 @@ class Pairs extends EntityExtend implements IPairs
 	 */
 	public function getName(): string
 	{
-		return self::OPTION_KEY;
+		return IPairs::OPTION_KEY;
 	}
 
 	/**
@@ -137,10 +136,10 @@ class Pairs extends EntityExtend implements IPairs
 			$nameList = array_keys($names);
 			if ($nameList[0] !== $identifier) {
 				$key = $names[$nameList[0]];
-			} elseif(count($names) > 1 && (is_string($names[$nameList[1]]) || is_numeric($names[$nameList[1]]))) {
+			} elseif (count($names) > 1 && (is_string($names[$nameList[1]]) || is_numeric($names[$nameList[1]]))) {
 				$key = $names[$nameList[1]];
 			}
-			$pattern = self::LABEL_PACKAGING . $key . self::LABEL_PACKAGING;
+			$pattern = "{{ " . $key . " }}";
 		}
 
 		$patternsKeys = $this->getPatternsKeys($pattern);
@@ -180,7 +179,6 @@ class Pairs extends EntityExtend implements IPairs
 	 */
 	public function setSelected(&$items)
 	{
-
 		if (!$this->attached) {
 			throw Exception::notAttached(get_class($this));
 		}
@@ -196,7 +194,7 @@ class Pairs extends EntityExtend implements IPairs
 
 		if ($this->control instanceof MultiChoiceControl) {
 
-			if ($items instanceof Collection ) {
+			if ($items instanceof Collection) {
 				if ($items->isEmpty()) {
 					$items = [];
 					return;
@@ -220,8 +218,6 @@ class Pairs extends EntityExtend implements IPairs
 		if (array_key_exists($identifier, $data)) {
 			$items = $data[$identifier];
 		}
-		return;
-
 	}
 
 	/**
@@ -309,7 +305,7 @@ class Pairs extends EntityExtend implements IPairs
 
 		foreach ($collection as $column) {
 			$columnData = $unitOfWork->getOriginalEntityData($column);
-			if($right) {
+			if ($right) {
 				if ($diffData[$entityRelationColumn] === $entityData[$entityColumn] && $diffData[$rightRelationColumn] === $columnData[$rightColumn]) {
 					return TRUE;
 				}
@@ -408,8 +404,8 @@ class Pairs extends EntityExtend implements IPairs
 	private function getItemsByControlVale()
 	{
 		$value = $this->control->getValue();
-		$result = null;
-		if(is_array($value)) {
+		$result = NULL;
+		if (is_array($value)) {
 			$items = [];
 			foreach ($value as $key) {
 				$items[] = $this->getItem($key);

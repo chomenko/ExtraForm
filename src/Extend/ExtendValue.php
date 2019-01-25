@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 03.01.2019
  */
 
 namespace Chomenko\ExtraForm\Extend;
@@ -23,7 +22,7 @@ class ExtendValue
 	/**
 	 * @var bool
 	 */
-	private $relationType = false;
+	private $relationType = FALSE;
 
 	/**
 	 * @param $originValue

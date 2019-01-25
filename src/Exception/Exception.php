@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 03.06.2018 22:28
  */
 
 namespace Chomenko\ExtraForm\Exception;
@@ -23,9 +22,9 @@ class Exception extends \Exception
 	 * @param $parameter
 	 * @return Exception
 	 */
-    public static function typeStringOrObject($parameter){
-    	return new Exception("EntityForm first parameter must be string or object. Your type is '".gettype($parameter)."'");
-    }
+	public static function typeStringOrObject($parameter){
+		return new Exception("EntityForm first parameter must be string or object. Your type is '" . gettype($parameter) . "'");
+	}
 
 	/**
 	 * @param string $class

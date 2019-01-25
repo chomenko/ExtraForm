@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 08.01.2019
  */
 
 namespace Chomenko\ExtraForm;
@@ -37,11 +36,11 @@ class FormFactory
 	 */
 	public function createForm(): ExtraForm
 	{
-		return new ExtraForm(null, null, $this->formEvents);
+		return new ExtraForm(NULL, NULL, $this->formEvents);
 	}
 
 	/**
-	 * @param $entity
+	 * @param string|object $entity
 	 * @return EntityForm
 	 * @throws \Exception
 	 */

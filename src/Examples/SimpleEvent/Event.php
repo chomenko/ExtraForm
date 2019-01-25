@@ -2,13 +2,12 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 05.01.2019
  */
 
 namespace Examples\SimpleEvent;
 
 use Chomenko\AutoInstall\AutoInstall;
-use Chomenko\AutoInstall\Tag;
+use Chomenko\AutoInstall\Config\Tag;
 use Chomenko\ExtraForm\Events\IFormEvent;
 use Chomenko\ExtraForm\EntityForm;
 use Chomenko\ExtraForm\Events\Listener;

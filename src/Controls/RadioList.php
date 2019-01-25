@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 01.06.2018 18:33
  */
 
 namespace Chomenko\ExtraForm\Controls;
@@ -12,8 +11,8 @@ use Chomenko\ExtraForm\Events\Listener;
 class RadioList extends \Nette\Forms\Controls\RadioList implements FormElement
 {
 
-    use Traits\Extend;
-    use Traits\Check;
+	use Traits\Extend;
+	use Traits\Check;
 	use Traits\Choice;
 
 	/**

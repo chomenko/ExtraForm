@@ -20,9 +20,9 @@ class UserFormFactory implements AutoInstall
 	 */
 	public $formFactory;
 
-	public function create(UserEntity $user = null): EntityForm
+	public function create(UserEntity $user = NULL): EntityForm
 	{
-		if(!$user){
+		if (!$user) {
 			$user = UserEntity::class;
 		}
 

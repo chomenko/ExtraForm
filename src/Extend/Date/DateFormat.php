@@ -48,12 +48,11 @@ class DateFormat extends EntityExtend
 	 * @param object $entity
 	 * @param ExtendValue $value
 	 * @return mixed|void
-	 * @throws \Chomenko\ExtraForm\Exception\Exception
 	 */
 	public function executeData(object $entity, ExtendValue $value)
 	{
 		parent::executeData($entity, $value);
-		$value->setNewValue( \DateTime::createFromFormat($this->format, $value->getOriginValue()));
+		$value->setNewValue(\DateTime::createFromFormat($this->format, $value->getOriginValue()));
 	}
 
 }

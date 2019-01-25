@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 01.06.2018 21:43
  */
 
 namespace Chomenko\ExtraForm\Controls\Traits;
@@ -30,24 +29,33 @@ trait Extend
 	 */
 	protected $constraints = [];
 
-    /**
-     * @param $value
-     * @param null $count
-     * @param bool $translate_modal
-     * @return mixed
-     */
-    public function translate($value, $count = null, $translate_modal = true)
-    {
-        if ($translator = $this->getTranslator()) {
-            $tmp = is_array($value) ? [&$value] : [[&$value]];
-            foreach ($tmp[0] as &$v) {
-                if ($v != null && !$v instanceof Html) { // intentionally ==
-                    $v = $translator->translate($v, $count, $translate_modal);
-                }
-            }
-        }
-        return $value;
-    }
+	/**
+	 * @param string $value
+	 * @param null|array|string $count
+	 * @param bool $translateModal
+	 * @return mixed
+	 */
+	public function translate($value, $count = NULL, $translateModal = TRUE)
+	{
+		if ($translator = $this->getTranslator()) {
+			$tmp = is_array($value) ? [&$value] : [[&$value]];
+			foreach ($tmp[0] as &$v) {
+				if ($v != NULL && !$v instanceof Html) { // intentionally ==
+					$v = $translator->translate($v, $count, $this->getForm()->getTranslateFile(), $translateModal);
+				}
+			}
+		}
+		return $value;
+	}
+
+	/**
+	 * @param  bool $throw
+	 * @return ExtraForm|null
+	 */
+	public function getForm($throw = TRUE): ?ExtraForm
+	{
+		return parent::getForm($throw);
+	}
 
 	/**
 	 * @param ExtraForm $form
@@ -66,6 +74,9 @@ trait Extend
 		$this->evenListener->emit(ControlEvents::INSTALLED, $this, $form);
 	}
 
+	/**
+	 * @param mixed $value
+	 */
 	public function setValue($value)
 	{
 		$this->evenListener->emit(ControlEvents::SET_VALUE, $this, $value);
@@ -92,27 +103,27 @@ trait Extend
 		$this->evenListener->emit(ControlEvents::AFTER_LOAD_HTTP_DATA, $this);
 	}
 
-    /**
-     * @param Html $el
-     */
-    protected function setErrorClass(Html $el)
-    {
-        if($this->hasErrors()){
-            HtmlUtility::addClass($el, 'is-invalid');
-        }
-    }
+	/**
+	 * @param Html $el
+	 */
+	protected function setErrorClass(Html $el)
+	{
+		if ($this->hasErrors()) {
+			HtmlUtility::addClass($el, 'is-invalid');
+		}
+	}
 
-    /**
-     * @return Html
-     */
-    public function render()
-    {
-        /** @var ExtraForm $form */
-        $form = $this->getForm();
-        $html = $form->builder()->getContentByItemName($form, $this->getName());
+	/**
+	 * @return Html
+	 */
+	public function render()
+	{
+		/** @var ExtraForm $form */
+		$form = $this->getForm();
+		$html = $form->builder()->getContentByItemName($form, $this->getName());
 		$this->evenListener->emit(ControlEvents::RENDER, $this, $html);
 		return $html;
-    }
+	}
 
 	/**
 	 * @return Listener
@@ -143,7 +154,6 @@ trait Extend
 		$this->evenListener->emit(ControlEvents::ADD_CONSTRAINT, $this, $constraint);
 	}
 
-
 	public function validate()
 	{
 		parent::validate();
@@ -155,14 +165,14 @@ trait Extend
 
 				$params = [];
 				$parameters = $error->getParameters();
-				if ($parameters && is_array($parameters)){
+				if ($parameters && is_array($parameters)) {
 					foreach ($parameters as $key => $value) {
 						$key = str_replace(["{{", " ", "}}"], "", $key);
 						$params[$key] = $value;
 					}
 				}
 				$message = $this->translate($error->getMessageTemplate(), $params);
-				$this->addError($message, false);
+				$this->addError($message, FALSE);
 			}
 		}
 	}

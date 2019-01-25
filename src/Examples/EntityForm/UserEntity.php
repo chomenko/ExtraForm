@@ -2,14 +2,12 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 08.01.2019
  */
 
 namespace Examples\EntityForm;
 
 use Doctrine\ORM\Mapping as ORM;
 use Kdyby\Doctrine\Entities\Attributes\Identifier;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="users")

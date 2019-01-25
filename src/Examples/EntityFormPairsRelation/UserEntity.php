@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 08.01.2019
  */
 
 namespace Examples\EntityFormPairsRelation;
@@ -89,7 +88,6 @@ class UserEntity
 	 */
 	private $countries;
 
-
 	public function __construct()
 	{
 		$this->registerDate = new \DateTime();
@@ -162,7 +160,7 @@ class UserEntity
 	 * @param \DateTime|null $activeTo
 	 * @return $this
 	 */
-	public function setActiveTo(\DateTime $activeTo = null)
+	public function setActiveTo(\DateTime $activeTo = NULL)
 	{
 		$this->activeTo = $activeTo;
 		return $this;
@@ -209,7 +207,7 @@ class UserEntity
 	 */
 	public function getCountries(): ?Collection
 	{
-		return $this->country;
+		return $this->countries;
 	}
 
 	/**

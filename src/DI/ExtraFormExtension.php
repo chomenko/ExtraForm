@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 05.01.2019
  */
 
 namespace Chomenko\ExtraForm\DI;
@@ -28,23 +27,23 @@ class ExtraFormExtension extends CompilerExtension
 		DateEvent::class
 	];
 
-    public function loadConfiguration()
-    {
-        $builder = $this->getContainerBuilder();
+	public function loadConfiguration()
+	{
+		$builder = $this->getContainerBuilder();
 
-        $events = $builder->addDefinition($this->prefix("FormEvents"))
-            ->setFactory(FormEvents::class);
+		$events = $builder->addDefinition($this->prefix("FormEvents"))
+			->setFactory(FormEvents::class);
 
-        foreach ($this->defaultEvents as $class) {
+		foreach ($this->defaultEvents as $class) {
 			$events->addSetup("addEvent", [new $class()]);
 		}
 
 		$builder->addDefinition($this->prefix("FormFactory"))
 			->setFactory(FormFactory::class);
-    }
+	}
 
 
-    public function beforeCompile()
+	public function beforeCompile()
 	{
 		$builder = $this->getContainerBuilder();
 		$event = $builder->getDefinition($this->prefix("FormEvents"));
@@ -54,13 +53,13 @@ class ExtraFormExtension extends CompilerExtension
 	}
 
 	/**
-     * @param Configurator $configurator
-     */
-    public static function register(Configurator $configurator)
-    {
-        $configurator->onCompile[] = function ($config, Compiler $compiler){
-            $compiler->addExtension('ExtraForm', new ExtraFormExtension());
-        };
-    }
+	 * @param Configurator $configurator
+	 */
+	public static function register(Configurator $configurator)
+	{
+		$configurator->onCompile[] = function ($config, Compiler $compiler){
+			$compiler->addExtension('ExtraForm', new ExtraFormExtension());
+		};
+	}
 
 }

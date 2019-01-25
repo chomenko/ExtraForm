@@ -2,11 +2,9 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 01.06.2018 19:22
  */
 
 namespace Chomenko\ExtraForm\Controls\Traits;
-
 
 use Nette\Utils\Html;
 use Chomenko\ExtraForm\Builds\HtmlUtility;
@@ -14,203 +12,203 @@ use Chomenko\ExtraForm\Builds\HtmlUtility;
 trait Button
 {
 
-    /**
-     * @var array
-     */
-    protected $button_style = 'btn-default';
+	/**
+	 * @var array
+	 */
+	protected $buttonStyle = 'btn-default';
 
-    /**
-     * @var string|null
-     */
-    protected $button_size = null;
+	/**
+	 * @var string|null
+	 */
+	protected $buttonSize = NULL;
 
-    /**
-     * @var boolean
-     */
-    protected $block = false;
+	/**
+	 * @var boolean
+	 */
+	protected $block = FALSE;
 
-    /**
-     * @var array
-     */
-    protected $before_icons = array();
+	/**
+	 * @var array
+	 */
+	protected $beforeIcons = [];
 
-    /**
-     * @var array
-     */
-    protected $after_icons = array();
+	/**
+	 * @var array
+	 */
+	protected $afterIcons = [];
 
-    /**
-     * @param $class
-     * @param bool $before
-     * @return $this
-     */
-    public function addIcon($class, $before = true)
-    {
-        if($before){
-            $this->before_icons[] = $class;
-        }else{
-            $this->after_icons[] = $class;
-        }
-        return $this;
-    }
+	/**
+	 * @param string $class
+	 * @param bool $before
+	 * @return $this
+	 */
+	public function addIcon(string $class, $before = TRUE)
+	{
+		if ($before) {
+			$this->beforeIcons[] = $class;
+		} else {
+			$this->afterIcons[] = $class;
+		}
+		return $this;
+	}
 
-    /**
-     * @var boolean $block
-     * @return $this
-     */
-    public function setBlock($block = true)
-    {
-        $this->block = $block;
-        return $this;
-    }
+	/**
+	 * @param bool $block
+	 * @return $this
+	 */
+	public function setBlock(bool $block = TRUE)
+	{
+		$this->block = $block;
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function setSizeLG()
-    {
-        $this->button_size = "btn-lg";
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function setSizeLG()
+	{
+		$this->buttonSize = "btn-lg";
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function setSizeDefault()
-    {
-        $this->button_size = null;
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function setSizeDefault()
+	{
+		$this->buttonSize = NULL;
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function setSizeSM()
-    {
-        $this->button_size = "btn-sm";
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function setSizeSM()
+	{
+		$this->buttonSize = "btn-sm";
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function asPrimary()
-    {
-        $this->button_style = "btn-primary";
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function asPrimary()
+	{
+		$this->buttonStyle = "btn-primary";
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function asSecondary()
-    {
-        $this->button_style = "btn-secondary";
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function asSecondary()
+	{
+		$this->buttonStyle = "btn-secondary";
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function asSuccess()
-    {
-        $this->button_style = "btn-success";
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function asSuccess()
+	{
+		$this->buttonStyle = "btn-success";
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function asDanger()
-    {
-        $this->button_style = "btn-danger";
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function asDanger()
+	{
+		$this->buttonStyle = "btn-danger";
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function asWarning()
-    {
-        $this->button_style = "btn-warning";
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function asWarning()
+	{
+		$this->buttonStyle = "btn-warning";
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function asInfo()
-    {
-        $this->button_style = "btn-warning";
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function asInfo()
+	{
+		$this->buttonStyle = "btn-warning";
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function asLight()
-    {
-        $this->button_style = "btn-light";
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function asLight()
+	{
+		$this->buttonStyle = "btn-light";
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function asDark()
-    {
-        $this->button_style = "btn-dark";
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function asDark()
+	{
+		$this->buttonStyle = "btn-dark";
+		return $this;
+	}
 
-    /**
-     * @return $this
-     */
-    public function asLink()
-    {
-        $this->button_style = "btn-link";
-        return $this;
-    }
+	/**
+	 * @return $this
+	 */
+	public function asLink()
+	{
+		$this->buttonStyle = "btn-link";
+		return $this;
+	}
 
 
-    /**
-     * @param  string|object
-     * @return Html
-     */
-    public function getControl($caption = null)
-    {
-        $this->setOption('rendered', true);
-        /** @var Html $el */
-        $el = clone $this->control;
-        $el->addAttributes([
-            'name' => $this->getHtmlName(),
-            'disabled' => $this->isDisabled()
-        ]);
+	/**
+	 * @param string|object $caption
+	 * @return Html
+	 */
+	public function getControl($caption = NULL)
+	{
+		$this->setOption('rendered', TRUE);
+		/** @var Html $el */
+		$el = clone $this->control;
+		$el->addAttributes([
+			'name' => $this->getHtmlName(),
+			'disabled' => $this->isDisabled(),
+		]);
 
-        $class = array();
-        $class[] = "btn";
-        $class[] = $this->button_style;
-        if($this->button_size){
-            $class[] = $this->button_size;
-        }
-        if($this->block){
-            $class[] = "btn-block";
-        }
+		$class = [];
+		$class[] = "btn";
+		$class[] = $this->buttonStyle;
+		if ($this->buttonSize) {
+			$class[] = $this->buttonSize;
+		}
+		if ($this->block) {
+			$class[] = "btn-block";
+		}
 
-        if (!$el->getAttribute("class")) {
-        	HtmlUtility::addClass($el, $class);
-        }
+		if (!$el->getAttribute("class")) {
+			HtmlUtility::addClass($el, $class);
+		}
 
-        foreach ($this->before_icons as $attr_class){
-            $el->addHtml(Html::el('i')->setAttribute('class', $attr_class));
-            $el->addHtml('&nbsp;');
-        }
-        $el->addHtml($this->translate($caption === null ? $this->caption : $caption));
-        foreach ($this->after_icons as $attr_class){
-            $el->addHtml('&nbsp;');
-            $el->addHtml(Html::el('i')->setAttribute('class', $attr_class));
-        }
-        return $el;
-    }
+		foreach ($this->beforeIcons as $attrClass) {
+			$el->addHtml(Html::el('i')->setAttribute('class', $attrClass));
+			$el->addHtml('&nbsp;');
+		}
+		$el->addHtml($this->translate($caption === NULL ? $this->caption : $caption));
+		foreach ($this->afterIcons as $attrClass) {
+			$el->addHtml('&nbsp;');
+			$el->addHtml(Html::el('i')->setAttribute('class', $attrClass));
+		}
+		return $el;
+	}
 
 }

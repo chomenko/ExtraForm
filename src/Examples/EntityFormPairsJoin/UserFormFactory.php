@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 08.01.2019
  */
 
 namespace Examples\EntityFormPairsJoin;
@@ -20,7 +19,7 @@ class UserFormFactory implements AutoInstall
 	 */
 	public $formFactory;
 
-	public function create(UserEntity $user = null): EntityForm
+	public function create(UserEntity $user = NULL): EntityForm
 	{
 		if(!$user){
 			$user = UserEntity::class;

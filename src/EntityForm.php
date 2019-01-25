@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 20.12.2018
  */
 
 namespace Chomenko\ExtraForm;
@@ -78,11 +77,11 @@ class EntityForm extends ExtraForm
 	 * @param FormEvents $formEvents
 	 * @throws \Exception
 	 */
-	public function __construct($entity, EntityManager $entityManager, FormEvents $formEvents = null)
+	public function __construct($entity, EntityManager $entityManager, FormEvents $formEvents = NULL)
 	{
 		$this->entityManager = $entityManager;
 		$this->unitOfWork = $entityManager->getUnitOfWork();
-		parent::__construct(null, null, $formEvents);
+		parent::__construct(NULL, NULL, $formEvents);
 		$this->annotationReader = new AnnotationReader();
 		$this->validator = Validation::createValidator();
 		$this->identifier = $this->installEntity($entity);
@@ -121,7 +120,7 @@ class EntityForm extends ExtraForm
 					$value->attached($component, $this);
 				}
 			}
-			$events->create(ControlEvents::SET_OPTION, function(BaseControl $control, $key, $value){
+			$events->create(ControlEvents::SET_OPTION, function (BaseControl $control, $key, $value) {
 				if ($value instanceof IEntityExtend) {
 					$value->attached($control, $this);
 				}
@@ -129,13 +128,9 @@ class EntityForm extends ExtraForm
 		}
 
 		$container = parent::addComponent($component, $name, $insertBefore);
-
 		if ($component instanceof FormElement) {
 			$this->applyAsserts($component, $name);
 		}
-
-
-
 		return $container;
 	}
 
@@ -146,7 +141,7 @@ class EntityForm extends ExtraForm
 	 */
 	private function installEntity($entity): string
 	{
-		$meta = null;
+		$meta = NULL;
 		if (is_string($entity)) {
 			$entity = $this->createEntityInstance($entity);
 		}
@@ -161,7 +156,7 @@ class EntityForm extends ExtraForm
 			$this->originalEntityData = $data = $this->unitOfWork->getOriginalEntityData($entity);
 		} else {
 			foreach ($this->metaData->getFieldNames() as $name) {
-				$this->originalEntityData[$name] = $this->metaData->getFieldValue($entity,$name);
+				$this->originalEntityData[$name] = $this->metaData->getFieldValue($entity, $name);
 			}
 		}
 
@@ -178,12 +173,12 @@ class EntityForm extends ExtraForm
 	{
 		if ($this->hasEntityField($name) && $component instanceof BaseControl) {
 			$property = new \ReflectionProperty($this->entity, $name);
-			$annotations =  $this->annotationReader->getPropertyAnnotations($property);
+			$annotations = $this->annotationReader->getPropertyAnnotations($property);
 			if ($this->metaData->hasField($name)) {
 				$component->setRequired(!$this->metaData->isNullable($name));
 			}
 			foreach ($annotations as $annotation) {
-				if($annotation instanceof Constraint) {
+				if ($annotation instanceof Constraint) {
 					$component->addConstraint($annotation);
 				}
 			}
@@ -227,7 +222,7 @@ class EntityForm extends ExtraForm
 	 */
 	public function getData()
 	{
-		if(!$this->isSubmitted() || $this->dataSet){
+		if (!$this->isSubmitted() || $this->dataSet) {
 			return $this->entity;
 		}
 
@@ -258,18 +253,18 @@ class EntityForm extends ExtraForm
 	{
 		$meta = $this->entityManager->getClassMetadata($entity);
 		$method = $meta->getReflectionClass()->getConstructor();
-		$withoutConstructor = false;
+		$withoutConstructor = FALSE;
 
 		foreach ($method->getParameters() as $parameter) {
 			if (!$parameter->isOptional()) {
-				$withoutConstructor = true;
+				$withoutConstructor = TRUE;
 				break;
 			}
 		}
 
-		if($withoutConstructor){
+		if ($withoutConstructor) {
 			$entity = $meta->newInstance();
-		}else{
+		} else {
 			$entity = new $entity();
 		}
 		return $entity;
@@ -281,7 +276,7 @@ class EntityForm extends ExtraForm
 	 * @param string $identifier
 	 * @return Pairs
 	 */
-	public static function createPairs(string $entity, string $pattern = null, string $identifier = null)
+	public static function createPairs(string $entity, string $pattern = NULL, string $identifier = NULL)
 	{
 		$pairs = new Pairs($entity, $pattern);
 		if ($identifier) {

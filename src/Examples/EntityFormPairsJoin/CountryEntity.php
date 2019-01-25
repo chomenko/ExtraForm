@@ -2,7 +2,6 @@
 /**
  * Author: Radek Zíka
  * Email: radek.zika@dipcom.cz
- * Created: 14.12.2018
  */
 
 namespace Examples\EntityFormPairsJoin;

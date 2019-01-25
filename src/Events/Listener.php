@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 27.12.2018
  */
 
 namespace Chomenko\ExtraForm\Events;

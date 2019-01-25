@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 31.05.2018 22:35
  */
 
 namespace Chomenko\ExtraForm;
@@ -16,29 +15,27 @@ use Nette\Utils\Html;
 class Builder extends Make
 {
 
-    use Wrappers;
-    use Grid;
+	use Wrappers;
+	use Grid;
 
-    /**
-     * @param string|array $items
-     * @param string $label
-     * @return Group
-     */
-    public function addGroup($label = null, $items = null)
-    {
+	/**
+	 * @param string|null $label
+	 * @param array|null $items
+	 * @return Group
+	 */
+	public function addGroup($label = NULL, $items = NULL): Group
+	{
+		$wrapped = Html::el('div', ['class' => 'form-group']);
+		$itemTo = Html::el('div', ['class' => 'input-group']);
 
-        $wrapped = Html::el('div', array('class' => 'form-group'));
-        $item_to = Html::el('div', array('class' => 'input-group'));
+		if ($label) {
+			$wrapped->addHtml(Html::el('label')->setHtml($this->render->translate($label)));
+		}
 
-        if($label){
-            $wrapped->addHtml(Html::el('label')->setHtml($this->render->translate($label)));
-        }
-
-        $group = new Group($this->render, $this, $wrapped, $item_to);
-        $group->addItem($items);
-        $this->addItem($group);
-        return $group;
-    }
-
+		$group = new Group($this->render, $this, $wrapped, $itemTo);
+		$group->addItem($items);
+		$this->addItem($group);
+		return $group;
+	}
 
 }

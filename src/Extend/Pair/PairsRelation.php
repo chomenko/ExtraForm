@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 04.01.2019
  */
 
 namespace Chomenko\ExtraForm\Extend\Pair;

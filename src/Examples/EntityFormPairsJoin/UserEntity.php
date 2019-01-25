@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 08.01.2019
  */
 
 namespace Examples\EntityFormPairsJoin;
@@ -159,7 +158,7 @@ class UserEntity
 	 * @param \DateTime|null $activeTo
 	 * @return $this
 	 */
-	public function setActiveTo(\DateTime $activeTo = null)
+	public function setActiveTo(\DateTime $activeTo = NULL)
 	{
 		$this->activeTo = $activeTo;
 		return $this;

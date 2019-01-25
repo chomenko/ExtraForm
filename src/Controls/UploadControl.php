@@ -2,7 +2,6 @@
 /**
  * Author: Mykola Chomenko
  * Email: mykola.chomenko@dipcom.cz
- * Created: 01.06.2018 18:36
  */
 
 namespace Chomenko\ExtraForm\Controls;
@@ -14,76 +13,76 @@ use Chomenko\ExtraForm\Builds\HtmlUtility;
 
 class UploadControl extends \Nette\Forms\Controls\UploadControl implements FormElement
 {
-    use Traits\Extend;
 
-    /**
-     * @var boolean
-     */
-    protected $custom = false;
+	use Traits\Extend;
 
-    /**
-     * @var string|null|Html
-     */
-    protected $input_caption;
+	/**
+	 * @var boolean
+	 */
+	protected $custom = FALSE;
+
+	/**
+	 * @var string|null|Html
+	 */
+	protected $inputCaption;
 
 	/**
 	 * @param null $label
 	 * @param bool $multiple
 	 */
-    public function __construct($label = NULL, bool $multiple = FALSE)
+	public function __construct($label = NULL, bool $multiple = FALSE)
 	{
 		$this->evenListener = new Listener();
 		parent::__construct($label, $multiple);
 	}
 
 	/**
-     * @param string|null|Html $caption
-     * @param boolean $custom
-     * @return $this
-     */
-    public function asCustom($caption = null, $custom = true)
-    {
-        $this->input_caption = $caption;
-        $this->custom = $custom;
-        return $this;
-    }
+	 * @param string|null|Html $caption
+	 * @param boolean $custom
+	 * @return $this
+	 */
+	public function asCustom($caption = NULL, $custom = TRUE)
+	{
+		$this->inputCaption = $caption;
+		$this->custom = $custom;
+		return $this;
+	}
 
-    /**
-     * @return bool
-     */
-    public function isCustom()
-    {
-        return $this->custom;
-    }
+	/**
+	 * @return bool
+	 */
+	public function isCustom()
+	{
+		return $this->custom;
+	}
 
-    /**
-     * @return Html|string
-     */
-    public function getControl()
-    {
+	/**
+	 * @return Html|string
+	 */
+	public function getControl()
+	{
+		$control = parent::getControl();
 
-        $control =  parent::getControl();
+		if (!$this->custom) {
+			return $control;
+		}
 
-        if(!$this->custom){
-            return $control;
-        }
+		HtmlUtility::addClass($control, 'custom-file-input');
+		$wrapped = Html::el('div', ['class' => ['custom-file']]);
+		$this->setErrorClass($control);
+		$wrapped->addHtml($control);
 
-        HtmlUtility::addClass($control, 'custom-file-input');
-        $wrapped = Html::el('div', ['class' => ['custom-file']]);
-        $this->setErrorClass($control);
-        $wrapped->addHtml($control);
+		$label = Html::el('label', [
+			'class' => ['custom-file-label'],
+			'for'   => $this->getHtmlId(),
+		]);
 
-        $label = Html::el('label', array(
-            'class' => ['custom-file-label'],
-            'for'   => $this->getHtmlId(),
-        ));
+		if (!empty($this->inputCaption)) {
+			$label->addHtml($this->translate($this->inputCaption));
+		}
 
-        if(!empty($this->input_caption)){
-            $label->addHtml($this->translate($this->input_caption));
-        }
-        $wrapped->addHtml($label);
-        return $wrapped;
-    }
-
+		$wrapped->addHtml($label);
+		return $wrapped;
+	}
 
 }
