@@ -128,7 +128,8 @@ class ExtraForm extends Form
 				return;
 			}
 			$payload = $this->getValidatePayload();
-			$this->getPresenter()->payload->forms[] = $payload;
+			$this->getPresenter()->payload->formsValidation[] = $payload;
+			return;
 		}
 		parent::fireEvents();
 	}
@@ -149,6 +150,7 @@ class ExtraForm extends Form
 	{
 		$payload = [
 			"name" => $this->getName(),
+			"id" => $this->getElementPrototype()->getAttribute("id"),
 			"errors" => [],
 			"fields" => [],
 		];
