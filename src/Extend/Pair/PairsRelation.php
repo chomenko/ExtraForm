@@ -110,7 +110,9 @@ class PairsRelation
 		}
 
 		if ($this->entityMapping["targetEntity"] === $this->rightEntity) {
-			$inversedBy = $this->entityMapping["inversedBy"];
+			if(!$inversedBy = $this->entityMapping["inversedBy"]) {
+				return;
+			}
 			$this->rightMapping = $this->rightMeta->getAssociationMapping($inversedBy);
 			return;
 		}

@@ -8,6 +8,7 @@ namespace Chomenko\ExtraForm;
 
 use Chomenko\ExtraForm\Events\IFormEvent;
 use Chomenko\ExtraForm\Events\Listener;
+use Nette\Application\Request;
 use Nette\ComponentModel\Component;
 use Nette\ComponentModel\IComponent;
 use Nette\ComponentModel\IContainer;
@@ -82,6 +83,14 @@ class ExtraForm extends Form
 	public function setTranslateFile($translateFile)
 	{
 		$this->translateFile = $translateFile;
+	}
+
+	public function addError($message, $parameters = NULL, $translate = TRUE)
+	{
+		if ($translate && $this->getTranslator()) {
+			$message = $this->getTranslator()->translate($message, $parameters, $this->getTranslateFile());
+		}
+		parent::addError($message, FALSE);
 	}
 
 	/**
@@ -419,6 +428,21 @@ class ExtraForm extends Form
 		$this->addComponent($component, $name);
 		$component->installed($this);
 		return $component;
+	}
+
+	protected function receiveHttpData()
+	{
+		$data = parent::receiveHttpData();
+		if ($data) {
+			return $data;
+		}
+		$presenter = $this->getPresenter();
+		$request = $presenter->getRequest();
+		
+		if ($request->isMethod('forward') && $request->hasFlag('post')) {
+			return \Nette\Utils\Arrays::mergeTree($request->getPost(), $request->getFiles());
+		}
+		return;
 	}
 
 }
