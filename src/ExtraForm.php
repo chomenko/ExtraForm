@@ -433,6 +433,12 @@ class ExtraForm extends Form
 	protected function receiveHttpData()
 	{
 		$data = parent::receiveHttpData();
+
+		$presenter = $this->getPresenter();
+		if (!$presenter->isSignalReceiver($this, 'submit')) {
+			return;
+		}
+
 		if ($data) {
 			return $data;
 		}
