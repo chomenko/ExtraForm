@@ -64,7 +64,10 @@ trait Check
 			]);
 			HtmlUtility::addClass($label, 'form-check-label');
 			$label->addHtml($item);
-			$label->addHtml($this->translate($labelText));
+
+			$span = Html::el("span", ["class" => "caption"])
+				->setHtml($this->translate($labelText));
+			$label->addHtml($span);
 
 			$wrapped = Html::el('div');
 			HtmlUtility::addClass($wrapped, [
