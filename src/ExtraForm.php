@@ -85,6 +85,11 @@ class ExtraForm extends Form
 		$this->translateFile = $translateFile;
 	}
 
+	/**
+	 * @param $message
+	 * @param null $parameters
+	 * @param bool $translate
+	 */
 	public function addError($message, $parameters = NULL, $translate = TRUE)
 	{
 		if ($translate && $this->getTranslator()) {
@@ -419,12 +424,29 @@ class ExtraForm extends Form
 
 	/**
 	 * @param string $name
+	 * @param string|array $destination
+	 * @param string|null $caption
+	 * @return Controls\LinkButton
+	 */
+	public function addLinkButton(string $name, $destination, $caption = NULL)
+	{
+		$component = new Controls\LinkButton($destination, $caption);
+		$html = $component->getControlPrototype();
+		$html->setName('a');
+		$this->addComponent($component, $name);
+		$component->installed($this);
+		return $component;
+	}
+
+
+	/**
+	 * @param string $name
 	 * @param null $default
 	 * @return Controls\HiddenField
 	 */
 	public function addHidden($name, $default = NULL)
 	{
-		$component = new Controls\HiddenField($name, $default);
+		$component = new Controls\HiddenField($default);
 		$this->addComponent($component, $name);
 		$component->installed($this);
 		return $component;

@@ -6,6 +6,7 @@
 
 namespace Chomenko\ExtraForm\Builds;
 
+use Chomenko\ExtraForm\Controls\LinkButton;
 use Nette\Forms\Controls\Button;
 use Nette\Forms\Controls\Checkbox;
 use Nette\Forms\Controls\CheckboxList;
@@ -183,6 +184,19 @@ trait Wrappers
 		if ($label = $component->getLabel()) {
 			$wrapper->addHtml($component->getLabel());
 		}
+		$wrapper->addHtml($component->getControl());
+		return $wrapper;
+	}
+
+	/**
+	 * @param Button $component
+	 * @return Html
+	 */
+	protected function renderLinkButton(LinkButton $component)
+	{
+		$wrapper = Html::el("div", [
+			'class' => 'form-group',
+		]);
 		$wrapper->addHtml($component->getControl());
 		return $wrapper;
 	}
