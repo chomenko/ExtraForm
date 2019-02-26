@@ -143,6 +143,7 @@ class ExtraForm extends Form
 			}
 			$payload = $this->getValidatePayload();
 			$this->getPresenter()->payload->formsValidation[] = $payload;
+			$this->getPresenter()->sendPayload();
 			return;
 		}
 		parent::fireEvents();
