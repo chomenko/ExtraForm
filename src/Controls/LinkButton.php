@@ -8,12 +8,13 @@ namespace Chomenko\ExtraForm\Controls;
 
 use Chomenko\ExtraForm\Events\Listener;
 use Chomenko\ExtraForm\ExtraForm;
-use Nette\Utils\Html;
+use Chomenko\ExtraForm\Controls\Traits\Button;
 
 class LinkButton extends \Nette\Forms\Controls\BaseControl implements FormElement
 {
 
 	use Traits\Extend;
+	use Button;
 
 	/**
 	 * @var string|array
@@ -32,15 +33,7 @@ class LinkButton extends \Nette\Forms\Controls\BaseControl implements FormElemen
 		$this->evenListener->create(ControlEvents::ATTACHED, function (LinkButton $linkButton, ExtraForm $extraForm) {
 			$extraForm->onAnchor[] = [$this, 'eventAttach'];
 		});
-
 		parent::__construct($caption);
-		$string = $this->translate($caption === NULL ? $this->caption : $caption);
-
-		if ($string instanceof Html) {
-			$this->control->setHtml($string);
-		} else {
-			$this->control->setText($string);
-		}
 	}
 
 	/**
