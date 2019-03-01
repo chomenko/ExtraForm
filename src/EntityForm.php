@@ -254,11 +254,12 @@ class EntityForm extends ExtraForm
 		$meta = $this->entityManager->getClassMetadata($entity);
 		$method = $meta->getReflectionClass()->getConstructor();
 		$withoutConstructor = FALSE;
-
-		foreach ($method->getParameters() as $parameter) {
-			if (!$parameter->isOptional()) {
-				$withoutConstructor = TRUE;
-				break;
+		if (!empty($method)) {
+			foreach ($method->getParameters() as $parameter) {
+				if (!$parameter->isOptional()) {
+					$withoutConstructor = TRUE;
+					break;
+				}
 			}
 		}
 
