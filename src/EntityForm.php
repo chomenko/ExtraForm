@@ -99,8 +99,11 @@ class EntityForm extends ExtraForm
 			if (!$this->hasEntityField($name)) {
 				continue;
 			}
-			$value = $this->getFieldValue($name);
-			$component->setDefaultValue($value);
+
+			if (method_exists($component, 'isUsedDefaultValue') && !$component->isUsedDefaultValue()) {
+				$value = $this->getFieldValue($name);
+				$component->setDefaultValue($value);
+			}
 		}
 	}
 

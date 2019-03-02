@@ -30,6 +30,11 @@ trait Extend
 	protected $constraints = [];
 
 	/**
+	 * @var bool
+	 */
+	protected $usedDefaultValue = FALSE;
+
+	/**
 	 * @param string $value
 	 * @param null|array|string $count
 	 * @param bool $translateModal
@@ -175,6 +180,25 @@ trait Extend
 				$this->addError($message, FALSE);
 			}
 		}
+	}
+
+	/**
+	 * Sets control's default value.
+	 * @return static
+	 */
+	public function setDefaultValue($value)
+	{
+		parent::setDefaultValue($value);
+		$this->usedDefaultValue = TRUE;
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isUsedDefaultValue(): bool
+	{
+		return $this->usedDefaultValue;
 	}
 
 }
