@@ -155,6 +155,10 @@ class EntityForm extends ExtraForm
 		$this->entity = $entity;
 		$this->metaData = $meta ? $meta : $this->entityManager->getClassMetadata(get_class($entity));
 
+		if ($entity instanceof \Doctrine\Common\Persistence\Proxy && !$entity->__isInitialized()) {
+			$entity->__load();
+		}
+
 		if ($this->entityManager->contains($entity)) {
 			$this->originalEntityData = $data = $this->unitOfWork->getOriginalEntityData($entity);
 		} else {
@@ -175,7 +179,7 @@ class EntityForm extends ExtraForm
 	protected function applyAsserts(IComponent $component, string $name)
 	{
 		if ($this->hasEntityField($name) && $component instanceof BaseControl) {
-			$property = new \ReflectionProperty($this->entity, $name);
+			$property = new \ReflectionProperty($this->metaData->getName(), $name);
 			$annotations = $this->annotationReader->getPropertyAnnotations($property);
 			if ($this->metaData->hasField($name)) {
 				$component->setRequired(!$this->metaData->isNullable($name));
