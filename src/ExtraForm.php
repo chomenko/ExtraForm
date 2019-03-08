@@ -8,6 +8,7 @@ namespace Chomenko\ExtraForm;
 
 use Chomenko\ExtraForm\Events\IFormEvent;
 use Chomenko\ExtraForm\Events\Listener;
+use Nette;
 use Nette\Application\Request;
 use Nette\ComponentModel\Component;
 use Nette\ComponentModel\IComponent;
@@ -45,6 +46,11 @@ class ExtraForm extends Form
 	private $translateFile;
 
 	/**
+	 * @var TranslatorWrapped
+	 */
+	protected $translatorWrapped;
+
+	/**
 	 * @param IContainer|null $parent
 	 * @param string|null $name
 	 * @param FormEvents|null $formEvents
@@ -52,6 +58,7 @@ class ExtraForm extends Form
 	public function __construct(IContainer $parent = NULL, $name = NULL, FormEvents $formEvents = NULL)
 	{
 		$this->eventsListener = new Listener();
+		$this->translatorWrapped = new TranslatorWrapped($this);
 		parent::__construct($parent, $name);
 
 		if ($formEvents) {
@@ -74,7 +81,7 @@ class ExtraForm extends Form
 	 */
 	public function getTranslateFile(): ?string
 	{
-		return $this->translateFile;
+		return $this->translatorWrapped->getTranslateFile();
 	}
 
 	/**
@@ -82,7 +89,17 @@ class ExtraForm extends Form
 	 */
 	public function setTranslateFile($translateFile)
 	{
-		$this->translateFile = $translateFile;
+		$this->translatorWrapped->setTranslateFile($translateFile);
+	}
+
+	/**
+	 * @param Nette\Localization\ITranslator|NULL $translator
+	 * @return static
+	 */
+	public function setTranslator(Nette\Localization\ITranslator $translator = NULL)
+	{
+		$this->translatorWrapped->setTranslator($translator);
+		return parent::setTranslator($this->translatorWrapped);
 	}
 
 	/**
@@ -92,8 +109,8 @@ class ExtraForm extends Form
 	 */
 	public function addError($message, $parameters = NULL, $translate = TRUE)
 	{
-		if ($translate && $this->getTranslator()) {
-			$message = $this->getTranslator()->translate($message, $parameters, $this->getTranslateFile());
+		if ($translate) {
+			$message = $this->translatorWrapped->translate($message, $parameters);
 		}
 		parent::addError($message, FALSE);
 	}

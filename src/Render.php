@@ -40,11 +40,11 @@ class Render implements IFormRenderer
 
 	/**
 	 * @param string $message
-	 * @param null $count
-	 * @param null $modal
+	 * @param null|array|string $count
+	 * @param bool $modal
 	 * @return string|Html
 	 */
-	public function translate($message, $count = NULL, $modal = NULL)
+	public function translate($message, $count = NULL, bool $modal = TRUE)
 	{
 		if ($translate = $this->form->getTranslator()) {
 			return $translate->translate($message, $count, $this->form->getTranslateFile(), $modal);
