@@ -15,9 +15,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Nette\Forms\Controls\BaseControl;
 use Nette\Forms\Controls\MultiChoiceControl;
+use Nette\SmartObject;
 
 class Pairs extends EntityExtend implements IPairs
 {
+
+	use SmartObject;
 
 	const PATTERN_REGEX = "~{{\s([a-zA-Z_0-9]+)\s}}~";
 
@@ -57,13 +60,20 @@ class Pairs extends EntityExtend implements IPairs
 	protected $metadata;
 
 	/**
+	 * @var callable
+	 */
+	private $itemFilter;
+
+	/**
 	 * @param string $entity
 	 * @param string $patter
+	 * @param callable $itemFilter
 	 * @param string $identifier
 	 */
-	public function __construct(string $entity, string $patter = NULL, string $identifier = NULL)
+	public function __construct(string $entity, string $patter = NULL, $itemFilter = NULL, string $identifier = NULL)
 	{
 		$this->entity = $entity;
+		$this->itemFilter = $itemFilter;
 		$this->setPattern($patter);
 		if ($identifier) {
 			$this->seIdentifier($identifier);
@@ -145,6 +155,15 @@ class Pairs extends EntityExtend implements IPairs
 		$patternsKeys = $this->getPatternsKeys($pattern);
 
 		foreach ($items as $item) {
+
+
+			if ($this->itemFilter) {
+				$result = call_user_func($this->itemFilter, $item);
+				if (!is_object($result) || !$item instanceof $result) {
+					continue;
+				}
+			}
+
 			$labelItem = $pattern;
 			$origin = $this->getForm()->getUnitOfWork()->getOriginalEntityData($item);
 
