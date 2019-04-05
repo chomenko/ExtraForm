@@ -23,6 +23,7 @@ use Nette\Forms\Controls\BaseControl;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class EntityForm extends ExtraForm
 {
@@ -272,7 +273,7 @@ class EntityForm extends ExtraForm
 				$extendValue = new ExtendValue($component->getValue());
 				foreach ($component->getOptions() as $option) {
 					if ($option instanceof IEntityExtend) {
-						$option->executeData($entity, $value);
+						$option->executeData($entity, $extendValue);
 					}
 				}
 				$value = $extendValue->getNewValue();
@@ -390,14 +391,18 @@ class EntityForm extends ExtraForm
 
 	/**
 	 * @param Constraint $constraint
-	 * @return ConstraintValidatorInterface
+	 * @return ConstraintValidatorInterface|RecursiveValidator
 	 * @throws Exception
 	 */
-	public function getValidatorByConstraint(Constraint $constraint): ConstraintValidatorInterface
+	public function getValidatorByConstraint(Constraint $constraint)
 	{
 		$validator = $this->getValidator();
 		if (method_exists($constraint, "validatedBy")) {
-			$validator = $this->getValidateService($constraint->validatedBy());
+			$tag = $constraint->validatedBy();
+			if (class_exists($tag)) {
+				return $validator;
+			}
+			$validator = $this->getValidateService($tag);
 		}
 		return $validator;
 	}
@@ -411,13 +416,13 @@ class EntityForm extends ExtraForm
 	{
 		$validators = $this->container->findByTag($name);
 		reset($validators);
-		$name = key($validators);
+		$serviceName = key($validators);
 
 		if (empty($validators)) {
 			throw Exception::constraintServiceUnregistered($name);
 		}
 
-		$validator = $this->container->getService($name);
+		$validator = $this->container->getService($serviceName);
 		if (!$validator instanceof ConstraintValidatorInterface) {
 			throw Exception::constraintServiceValidatorMustInstance($validator);
 		}
