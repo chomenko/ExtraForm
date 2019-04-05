@@ -9,12 +9,14 @@ namespace Chomenko\ExtraForm;
 use Chomenko\ExtraForm\Events\IFormEvent;
 use Chomenko\ExtraForm\Events\Listener;
 use Nette;
-use Nette\Application\Request;
-use Nette\ComponentModel\Component;
 use Nette\ComponentModel\IComponent;
 use Nette\ComponentModel\IContainer;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\BaseControl;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class ExtraForm
@@ -41,14 +43,14 @@ class ExtraForm extends Form
 	protected $eventsListener;
 
 	/**
-	 * @var string|null
-	 */
-	private $translateFile;
-
-	/**
 	 * @var TranslatorWrapped
 	 */
 	protected $translatorWrapped;
+
+	/**
+	 * @var ValidatorInterface
+	 */
+	private $validator;
 
 	/**
 	 * @param IContainer|null $parent
@@ -59,6 +61,8 @@ class ExtraForm extends Form
 	{
 		$this->eventsListener = new Listener();
 		$this->translatorWrapped = new TranslatorWrapped($this);
+		$this->validator = Validation::createValidator();
+
 		parent::__construct($parent, $name);
 
 		if ($formEvents) {
@@ -103,7 +107,7 @@ class ExtraForm extends Form
 	}
 
 	/**
-	 * @param $message
+	 * @param string|Nette\Utils\Html $message
 	 * @param null $parameters
 	 * @param bool $translate
 	 */
@@ -208,6 +212,32 @@ class ExtraForm extends Form
 			$payload['fields'][] = $field;
 		}
 		return $payload;
+	}
+
+	/**
+	 * @param ConstraintViolationListInterface $errors
+	 * @param Component $component
+	 */
+	public function addConstraintErrors(ConstraintViolationListInterface $errors, Nette\ComponentModel\Component $component = NULL)
+	{
+		/** @var ConstraintViolation $error */
+		foreach ($errors as $error) {
+			$params = [];
+			$parameters = $error->getParameters();
+			if ($parameters && is_array($parameters)) {
+				foreach ($parameters as $key => $value) {
+					$key = str_replace(["{{", " ", "}}"], "", $key);
+					$params[$key] = $value;
+				}
+			}
+
+			$message = $this->translatorWrapped->translate($error->getMessageTemplate(), $params);
+			if ($component) {
+				$component->addError($message, FALSE);
+			} else {
+				$this->addError($message, FALSE);
+			}
+		}
 	}
 
 	/**
@@ -470,6 +500,24 @@ class ExtraForm extends Form
 		return $component;
 	}
 
+	/**
+	 * @return ValidatorInterface
+	 */
+	public function getValidator(): ValidatorInterface
+	{
+		return $this->validator;
+	}
+
+	/**
+	 * @param ValidatorInterface $validator
+	 * @return $this
+	 */
+	public function setValidator($validator)
+	{
+		$this->validator = $validator;
+		return $this;
+	}
+
 	protected function receiveHttpData()
 	{
 		$data = parent::receiveHttpData();
@@ -484,7 +532,7 @@ class ExtraForm extends Form
 		}
 		$presenter = $this->getPresenter();
 		$request = $presenter->getRequest();
-		
+
 		if ($request->isMethod('forward') && $request->hasFlag('post')) {
 			return \Nette\Utils\Arrays::mergeTree($request->getPost(), $request->getFiles());
 		}

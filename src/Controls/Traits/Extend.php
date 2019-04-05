@@ -8,14 +8,16 @@ namespace Chomenko\ExtraForm\Controls\Traits;
 
 use Chomenko\ExtraForm\Builds\HtmlUtility;
 use Chomenko\ExtraForm\Controls\ControlEvents;
+use Chomenko\ExtraForm\EntityForm;
 use Chomenko\ExtraForm\Events\Listener;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\Validation;
 use Chomenko\ExtraForm\ExtraForm;
 use Nette\InvalidArgumentException;
 use Nette\Utils\Html;
 
+/**
+ * @property-read ExtraForm|EntityForm $form
+ */
 trait Extend
 {
 
@@ -163,27 +165,19 @@ trait Extend
 	{
 		parent::validate();
 		foreach ($this->constraints as $constraint) {
-			$validator = Validation::createValidator();
-			$errors = $validator->validate($this->getValue(), $constraint);
-			/** @var ConstraintViolation $error */
-			foreach ($errors as $error) {
-
-				$params = [];
-				$parameters = $error->getParameters();
-				if ($parameters && is_array($parameters)) {
-					foreach ($parameters as $key => $value) {
-						$key = str_replace(["{{", " ", "}}"], "", $key);
-						$params[$key] = $value;
-					}
-				}
-				$message = $this->translate($error->getMessageTemplate(), $params);
-				$this->addError($message, FALSE);
+			$form = $this->form;
+			$validator = $form->getValidator();
+			if ($form instanceof ExtraForm) {
+				$validator = $form->getValidatorByConstraint($constraint);
+			}
+			if ($errors = $validator->validate($this->getValue(), $constraint)) {
+				$this->form->addConstraintErrors($errors, $this);
 			}
 		}
 	}
 
 	/**
-	 * Sets control's default value.
+	 * @param mixed $value
 	 * @return static
 	 */
 	public function setDefaultValue($value)

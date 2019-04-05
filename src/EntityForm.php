@@ -8,6 +8,7 @@ namespace Chomenko\ExtraForm;
 
 use Chomenko\ExtraForm\Controls\ControlEvents;
 use Chomenko\ExtraForm\Controls\FormElement;
+use Chomenko\ExtraForm\Controls\Traits\Extend;
 use Chomenko\ExtraForm\Extend\ExtendValue;
 use Chomenko\ExtraForm\Extend\IEntityExtend;
 use Chomenko\ExtraForm\Extend\Pair\Pairs;
@@ -17,9 +18,11 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 use Nette\ComponentModel\IComponent;
+use Nette\DI\Container;
 use Nette\Forms\Controls\BaseControl;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 class EntityForm extends ExtraForm
 {
@@ -67,24 +70,31 @@ class EntityForm extends ExtraForm
 	private $annotationReader;
 
 	/**
-	 * @var \Symfony\Component\Validator\Validator\ValidatorInterface
+	 * @var Container
 	 */
-	private $validator;
+	private $container;
+
+	/**
+	 * @var Constraint[]
+	 */
+	protected $constraint = [];
 
 	/**
 	 * @param string|object $entity
+	 * @param Container $container
 	 * @param EntityManager $entityManager
 	 * @param FormEvents $formEvents
-	 * @throws \Exception
+	 * @throws Exception
+	 * @throws \Doctrine\Common\Annotations\AnnotationException
 	 */
-	public function __construct($entity, EntityManager $entityManager, FormEvents $formEvents = NULL)
+	public function __construct($entity, Container $container, EntityManager $entityManager, FormEvents $formEvents = NULL)
 	{
 		$this->entityManager = $entityManager;
 		$this->unitOfWork = $entityManager->getUnitOfWork();
 		parent::__construct(NULL, NULL, $formEvents);
 		$this->annotationReader = new AnnotationReader();
-		$this->validator = Validation::createValidator();
 		$this->identifier = $this->installEntity($entity);
+		$this->container = $container;
 	}
 
 	/**
@@ -167,12 +177,20 @@ class EntityForm extends ExtraForm
 			}
 		}
 
+		$refClass = new \ReflectionClass($entity);
+		$annotations = $this->annotationReader->getClassAnnotations($refClass);
+		foreach ($annotations as $annotation) {
+			if ($annotation instanceof Constraint) {
+				$this->constraint[] = $annotation;
+			}
+		}
+
 		$this->eventsListener->emit(self::INSTALL_ENTITY, $entity, $this);
 		return $this->getEntityIdentifier($entity);
 	}
 
 	/**
-	 * @param IComponent $component
+	 * @param IComponent|Extend $component
 	 * @param string $name
 	 * @throws \ReflectionException
 	 */
@@ -232,23 +250,35 @@ class EntityForm extends ExtraForm
 		if (!$this->isSubmitted() || $this->dataSet) {
 			return $this->entity;
 		}
+		$this->setEntityValues($this->entity);
+		$this->dataSet = TRUE;
+		return $this->entity;
+	}
 
+	/**
+	 * @param object $entity
+	 * @param bool $events
+	 */
+	protected function setEntityValues(object $entity, bool $events = TRUE)
+	{
 		/** @var BaseControl $component */
 		foreach ($this->components as $component) {
 			$name = $component->getName();
 			if (!$this->hasEntityField($name)) {
 				continue;
 			}
-			$value = new ExtendValue($component->getValue());
-			foreach ($component->getOptions() as $option) {
-				if ($option instanceof IEntityExtend) {
-					$option->executeData($this->entity, $value);
+			$value = $component->getValue();
+			if ($events) {
+				$extendValue = new ExtendValue($component->getValue());
+				foreach ($component->getOptions() as $option) {
+					if ($option instanceof IEntityExtend) {
+						$option->executeData($entity, $value);
+					}
 				}
+				$value = $extendValue->getNewValue();
 			}
-			$this->metaData->setFieldValue($this->entity, $name, $value->getNewValue());
+			$this->metaData->setFieldValue($entity, $name, $value);
 		}
-		$this->dataSet = TRUE;
-		return $this->entity;
 	}
 
 	/**
@@ -331,6 +361,67 @@ class EntityForm extends ExtraForm
 	public function getOriginalEntityData(): array
 	{
 		return $this->originalEntityData;
+	}
+
+	public function validate(array $controls = NULL)
+	{
+		parent::validate($controls);
+
+		if (!empty($this->constraint)) {
+
+			$entity = clone $this->entity;
+
+			$this->setEntityValues($entity, FALSE);
+
+			foreach ($this->constraint as $constraint) {
+				$validator = $this->getValidatorByConstraint($constraint);
+				$error = $validator->validate($entity, $constraint);
+				if ($error instanceof ConstraintViolationList) {
+					$this->addConstraintErrors($error);
+				}
+				if (is_string($error)) {
+					$message = $this->translatorWrapped->translate($error);
+					$this->addError($message);
+				}
+			}
+			unset($entity);
+		}
+	}
+
+	/**
+	 * @param Constraint $constraint
+	 * @return ConstraintValidatorInterface
+	 * @throws Exception
+	 */
+	public function getValidatorByConstraint(Constraint $constraint): ConstraintValidatorInterface
+	{
+		$validator = $this->getValidator();
+		if (method_exists($constraint, "validatedBy")) {
+			$validator = $this->getValidateService($constraint->validatedBy());
+		}
+		return $validator;
+	}
+
+	/**
+	 * @param string $name
+	 * @return ConstraintValidatorInterface
+	 * @throws Exception
+	 */
+	public function getValidateService(string $name): ConstraintValidatorInterface
+	{
+		$validators = $this->container->findByTag($name);
+		reset($validators);
+		$name = key($validators);
+
+		if (empty($validators)) {
+			throw Exception::constraintServiceUnregistered($name);
+		}
+
+		$validator = $this->container->getService($name);
+		if (!$validator instanceof ConstraintValidatorInterface) {
+			throw Exception::constraintServiceValidatorMustInstance($validator);
+		}
+		return $validator;
 	}
 
 }

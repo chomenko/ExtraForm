@@ -7,6 +7,7 @@
 namespace Chomenko\ExtraForm;
 
 use Kdyby\Doctrine\EntityManager;
+use Nette\DI\Container;
 
 class FormFactory
 {
@@ -22,12 +23,35 @@ class FormFactory
 	protected $formEvents;
 
 	/**
-	 * @param EntityManager $entityManager
-	 * @param FormEvents $formEvents
+	 * @var Container
 	 */
-	public function __construct(EntityManager $entityManager, FormEvents $formEvents)
+	protected $container;
+
+	public function __construct()
+	{
+	}
+
+	/**
+	 * @param Container $container
+	 */
+	public function injectContainer(Container $container)
+	{
+		$this->container = $container;
+	}
+
+	/**
+	 * @param EntityManager $entityManager
+	 */
+	public function injectEntityManager(EntityManager $entityManager)
 	{
 		$this->entityManager = $entityManager;
+	}
+
+	/**
+	 * @param FormEvents $formEvents
+	 */
+	public function injectFormEvents(FormEvents $formEvents)
+	{
 		$this->formEvents = $formEvents;
 	}
 
@@ -46,7 +70,7 @@ class FormFactory
 	 */
 	public function createEntityForm($entity): EntityForm
 	{
-		return new EntityForm($entity, $this->entityManager, $this->formEvents);
+		return new EntityForm($entity, $this->container, $this->entityManager, $this->formEvents);
 	}
 
 	/**

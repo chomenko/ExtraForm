@@ -10,6 +10,8 @@ use Chomenko\ExtraForm\Extend\Date\DateEvent;
 use Chomenko\ExtraForm\Extend\Pair\PairEvent;
 use Chomenko\ExtraForm\FormEvents;
 use Chomenko\ExtraForm\FormFactory;
+use Chomenko\ExtraForm\Validator\Constraints\UniqueEntity;
+use Chomenko\ExtraForm\Validator\Constraints\UniqueEntityValidator;
 use Nette\Configurator;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
@@ -34,12 +36,17 @@ class ExtraFormExtension extends CompilerExtension
 		$events = $builder->addDefinition($this->prefix("FormEvents"))
 			->setFactory(FormEvents::class);
 
+		$builder->addDefinition($this->prefix("UniqueEntityValidator"))
+			->setFactory(UniqueEntityValidator::class)
+			->addTag("extraForm.validator.unique");
+
 		foreach ($this->defaultEvents as $class) {
 			$events->addSetup("addEvent", [new $class()]);
 		}
 
 		$builder->addDefinition($this->prefix("FormFactory"))
-			->setFactory(FormFactory::class);
+			->setFactory(FormFactory::class)
+			->setInject(TRUE);
 	}
 
 

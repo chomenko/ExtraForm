@@ -130,7 +130,7 @@ abstract class Make
 		}
 
 		if (!is_string($name) && !is_array($name) && !$name instanceof Make && !$name instanceof Html) {
-			throw Exception::AddItemFailed();
+			throw Exception::addItemFailed();
 		}
 
 		if (is_array($name)) {
