@@ -78,11 +78,26 @@ abstract class Make
 	public function getContentByItemName(Form $form, $name)
 	{
 		$component = $form->getComponent($name);
+
 		$path = explode('\\', get_class($component));
 		$name = array_pop($path);
+
 		if (method_exists($this, 'render' . $name)) {
 			return $this->{'render' . $name}($component);
 		}
+
+		if (method_exists($component, "render")) {
+			$output = NULL;
+			ob_start();
+			$result = call_user_func_array([$component, "render"], [$form]);
+			$output = ob_get_contents();
+			if (empty($output) && !empty($result)) {
+				$output = $result;
+			}
+			ob_end_clean();
+			return $output;
+		}
+
 		return $component->getControl();
 	}
 
