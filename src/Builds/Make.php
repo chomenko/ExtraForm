@@ -77,15 +77,10 @@ abstract class Make
 	 * @param string $name
 	 * @return Html
 	 */
-	public function getContentByItemName(IComponent $form, $name)
+	public function getContentByItemName(Form $form, $name)
 	{
 		$component = $form->getComponent($name);
 
-		if ($component instanceof Container) {
-			foreach ($component->getControls() as $control) {
-				return $this->getContentByItemName($component, $control->name);
-			}
-		}
 		$path = explode('\\', get_class($component));
 		$name = array_pop($path);
 
