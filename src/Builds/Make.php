@@ -9,6 +9,8 @@ namespace Chomenko\ExtraForm\Builds;
 use Chomenko\ExtraForm\Builder;
 use Chomenko\ExtraForm\Exception\Exception;
 use Chomenko\ExtraForm\Render;
+use Nette\ComponentModel\IComponent;
+use Nette\Forms\Container;
 use Nette\Forms\Form;
 use Nette\Utils\Html;
 
@@ -75,10 +77,15 @@ abstract class Make
 	 * @param string $name
 	 * @return Html
 	 */
-	public function getContentByItemName(Form $form, $name)
+	public function getContentByItemName(IComponent $form, $name)
 	{
 		$component = $form->getComponent($name);
 
+		if ($component instanceof Container) {
+			foreach ($component->getControls() as $control) {
+				return $this->getContentByItemName($component, $control->name);
+			}
+		}
 		$path = explode('\\', get_class($component));
 		$name = array_pop($path);
 
@@ -100,6 +107,7 @@ abstract class Make
 
 		return $component->getControl();
 	}
+
 
 	/**
 	 * @param Form $form
