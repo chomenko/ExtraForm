@@ -283,10 +283,8 @@ class Pairs extends EntityExtend implements IPairs
 			}
 
 			$collection = new ArrayCollection($selected);
-
 			foreach ($columns as $defaultValue) {
-
-				if ($this->containsRelation($collection, $entity, $defaultValue, TRUE) || $collection->isEmpty()) {
+				if ($this->containsRelation($collection, $entity, $defaultValue, TRUE) || !$collection->isEmpty()) {
 					continue;
 				}
 				$this->entityManager->remove($defaultValue);

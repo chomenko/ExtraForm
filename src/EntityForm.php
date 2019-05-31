@@ -369,11 +369,12 @@ class EntityForm extends ExtraForm
 		parent::validate($controls);
 
 		if (!empty($this->constraint)) {
-
 			$entity = clone $this->entity;
-
 			$this->setEntityValues($entity, FALSE);
 
+			$meta = $this->entityManager->getClassMetadata(get_class($this->entity));
+			$identifiers = $meta->getIdentifierValues($this->entity);
+			$meta->setIdentifierValues($entity, $identifiers);
 			foreach ($this->constraint as $constraint) {
 				$validator = $this->getValidatorByConstraint($constraint);
 				$error = $validator->validate($entity, $constraint);
