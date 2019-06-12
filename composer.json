@@ -26,5 +26,12 @@
     "psr-4": {
       "Chomenko\\ExtraForm\\": "src/"
     }
+  },
+  "extra": {
+    "nettpack": {
+      "resolve": {
+        "FormComponent": "./src/Assets/main.js"
+      }
+    }
   }
 }
