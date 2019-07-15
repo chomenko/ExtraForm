@@ -14,6 +14,7 @@ Required:
 - nette/forms
 - symfony/validator
 - kdyby/doctrine
+- [nettpack/stage](https://github.com/nettpack/stage)
 
 ### Install 
 
