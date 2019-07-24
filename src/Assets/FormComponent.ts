@@ -9,25 +9,34 @@ import 'jquery-datetimepicker/build/jquery.datetimepicker.full';
 import 'jquery-datetimepicker/build/jquery.datetimepicker.min.css';
 import 'select2/dist/js/select2';
 import 'select2/dist/css/select2.css';
-import {App, BaseComponent, SAGA_CLICK_AJAX_REQUEST_STARTED, SAGA_REDRAW_SNIPPET, AjaxOptions} from "Stage"
+
+
+import {App, BaseComponent, SAGA_CLICK_AJAX_REQUEST_STARTED, SAGA_REDRAW_SNIPPET, AjaxOptions, Saga} from "Stage"
 
 class FormComponent extends BaseComponent {
 
-	initial() {
-		super.initial();
-		this.installPlugins();
-		this.createSaga(SAGA_REDRAW_SNIPPET, this.installPlugins);
-		this.createSaga(SAGA_CLICK_AJAX_REQUEST_STARTED, this.clickButtonSaga);
-		this.createSaga('validate_saga', this.validateSaga);
-		this.spanErrorClass = 'help-block';
-		this.divErrorClass = 'has-error';
-		this.timeout = undefined;
-		this.state = {
-			validated: false
-		}
+
+	constructor(App) {
+		super(App)
 	}
 
-	installPlugins(action) {
+	private timeout;
+	private state = {
+		validated: false
+	};
+
+	private spanErrorClass = 'help-block';
+	private divErrorClass = 'has-error';
+
+	initial() {
+
+		super.initial();
+		this.installPlugins();
+	}
+
+
+	@Saga(SAGA_REDRAW_SNIPPET)
+	public installPlugins(action = null) {
 
 		let target = document;
 		if (action) {
@@ -48,7 +57,6 @@ class FormComponent extends BaseComponent {
 				if ($.inArray($(this).prop('name'), ['send', '_do']) < 0) {
 					// local.addInputListeners(input)
 					the.installInputListener(input);
-					console.log(input);
 				}
 			});
 		});
@@ -69,7 +77,7 @@ class FormComponent extends BaseComponent {
 		});
 	}
 
-	installInputListener(el)
+	private installInputListener(el)
 	{
 		const the = this;
 		let timeout;
@@ -86,7 +94,7 @@ class FormComponent extends BaseComponent {
 				timeout = setTimeout(function () {
 					// FOR ONLY ONE FIELD IN VALIDATION
 					the.removeErrors(form, fieldName);
-					the.validateForm(form, fieldName);
+					the.validateForm(form);
 
 					the.state.validated = true;
 				},1000);
@@ -99,14 +107,14 @@ class FormComponent extends BaseComponent {
 			// FOR ONLY ONE FIELD IN VALIDATION
 			let fieldName = $(this)[0].name;
 			the.removeErrors(form, fieldName);
-			the.validateForm(form, fieldName);
+			the.validateForm(form);
 
 			the.state.validated = true;
 		})
 
 	}
-
-	validateSaga(action) {
+	@Saga('validate_saga')
+	private validateSaga(action) {
 		const {payload} = action;
 		const {Action} = payload;
 		const {data} = Action;
@@ -151,7 +159,7 @@ class FormComponent extends BaseComponent {
 	 * @param {string} field
 	 * @param {[]} errors
 	 */
-	validateField (form, field, errors) {
+	private validateField (form, field, errors) {
 		let input = form.find('input[name=' + field + '], select[name=' + field + ']').not('input[type="checkbox"]');
 		let div = input.closest("div");
 
@@ -178,7 +186,7 @@ class FormComponent extends BaseComponent {
 	 * @param {jQuery} form
 	 * @param {string} fieldName
 	 */
-	removeErrors (form, fieldName) {
+	private removeErrors (form, fieldName = null) {
 
 		const divErrorClass = this.divErrorClass;
 		const spanErrorClass = this.spanErrorClass;
@@ -207,7 +215,7 @@ class FormComponent extends BaseComponent {
 	 * @param {jQuery} form
 	 * @param {string} fieldName
 	 */
-	hasHtmlErrors (form, fieldName) {
+	private hasHtmlErrors (form, fieldName = null) {
 		if (fieldName) {
 			let input = form.find('input[name=' + fieldName + ']');
 			let div = input.closest('.' + this.divErrorClass);
@@ -218,8 +226,8 @@ class FormComponent extends BaseComponent {
 	};
 
 
-
-	clickButtonSaga(action) {
+	@Saga(SAGA_CLICK_AJAX_REQUEST_STARTED)
+	public  clickButtonSaga(action) {
 		const {element, event}  = action.payload;
 		if (!element.is("button")) {
 			return
@@ -254,7 +262,7 @@ class FormComponent extends BaseComponent {
 
 	}
 
-	validateForm(form) {
+	private validateForm(form) {
 		if ($(form).hasClass("novalidate")) {
 			return;
 		}
