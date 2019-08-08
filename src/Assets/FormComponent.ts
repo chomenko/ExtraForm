@@ -11,7 +11,7 @@ import 'select2/dist/js/select2';
 import 'select2/dist/css/select2.css';
 
 
-import {App, BaseComponent, SAGA_CLICK_AJAX_REQUEST_STARTED, SAGA_REDRAW_SNIPPET, AjaxOptions, Saga} from "Stage"
+import {App, BaseComponent, SAGA_CLICK_AJAX_REQUEST_STARTED, SAGA_REDRAW_SNIPPET, AjaxOptions, Saga, addSagasParameter} from "Stage"
 
 class FormComponent extends BaseComponent {
 
@@ -94,7 +94,7 @@ class FormComponent extends BaseComponent {
 				timeout = setTimeout(function () {
 					// FOR ONLY ONE FIELD IN VALIDATION
 					the.removeErrors(form, fieldName);
-					the.validateForm(form);
+					the.validateForm(form, fieldName);
 
 					the.state.validated = true;
 				},1000);
@@ -107,7 +107,7 @@ class FormComponent extends BaseComponent {
 			// FOR ONLY ONE FIELD IN VALIDATION
 			let fieldName = $(this)[0].name;
 			the.removeErrors(form, fieldName);
-			the.validateForm(form);
+			the.validateForm(form, fieldName);
 
 			the.state.validated = true;
 		})
@@ -119,6 +119,11 @@ class FormComponent extends BaseComponent {
 		const {Action} = payload;
 		const {data} = Action;
 		const forms = data.formsValidation;
+
+		let selectedFieldName = undefined;
+		if (Action.sagasParameters && Action.sagasParameters.selectedFieldName) {
+			selectedFieldName = Action.sagasParameters.selectedFieldName;
+		}
 
 		if (!forms) {
 			return;
@@ -142,14 +147,14 @@ class FormComponent extends BaseComponent {
 				let errors = field.errors;
 
 				// VALIDATE ONLY ONE FIELD
-				// if (selectedFieldName) {
-				// 	if (selectedFieldName === fieldName) {
-				// 		local.validateField(htmlForm, fieldName, errors);
-				// 	}
-				// } else {
+				if (selectedFieldName) {
+					if (selectedFieldName === fieldName) {
+						this.validateField(htmlForm, fieldName, errors);
+					}
+				} else {
 					// VALIDATE ALL FIELDS
 					this.validateField(htmlForm, fieldName, errors);
-				// }
+				}
 			}
 		}
 	}
@@ -262,13 +267,16 @@ class FormComponent extends BaseComponent {
 
 	}
 
-	private validateForm(form) {
+	private validateForm(form, fieldName = null) {
 		if ($(form).hasClass("novalidate")) {
 			return;
 		}
-
 		const formData = new FormData(form[0]);
 		formData.append('saga','validate_saga');
+		if (fieldName) {
+			addSagasParameter(formData, 'selectedFieldName', fieldName);
+		}
+
 		formData.append('_validate','1');
 
 		let defaultOption = AjaxOptions({
