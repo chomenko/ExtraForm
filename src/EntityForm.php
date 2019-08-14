@@ -6,9 +6,11 @@
 
 namespace Chomenko\ExtraForm;
 
+use Bundles\Stock\Entity\StockItem;
 use Chomenko\ExtraForm\Controls\ControlEvents;
 use Chomenko\ExtraForm\Controls\FormElement;
 use Chomenko\ExtraForm\Controls\Traits\Extend;
+use Chomenko\ExtraForm\Events\ChangeSet;
 use Chomenko\ExtraForm\Extend\ExtendValue;
 use Chomenko\ExtraForm\Extend\IEntityExtend;
 use Chomenko\ExtraForm\Extend\Pair\Pairs;
@@ -165,6 +167,9 @@ class EntityForm extends ExtraForm
 		}
 		$this->entity = $entity;
 		$this->metaData = $meta ? $meta : $this->entityManager->getClassMetadata(get_class($entity));
+
+//		$this->metaData->addEntityListener()
+
 
 		if ($entity instanceof \Doctrine\Common\Persistence\Proxy && !$entity->__isInitialized()) {
 			$entity->__load();
@@ -428,6 +433,34 @@ class EntityForm extends ExtraForm
 			throw Exception::constraintServiceValidatorMustInstance($validator);
 		}
 		return $validator;
+	}
+
+	public function applyEntityChange()
+	{
+		$entity = $this->getEntity();
+		$em = $this->getEntityManager();
+
+		$metadata = $em->getClassMetadata(get_class($entity));
+		if ($entity instanceof StockItem) {
+			foreach ($this->getOriginalEntityData() as $name => $value) {
+				if (array_search($name, $metadata->getFieldNames()) === FALSE) {
+					continue;
+				}
+
+				$currentValue = $metadata->getFieldValue($entity, $name);
+				if (is_object($currentValue)) {
+					continue;
+				}
+
+				$component = $this->getComponent($name, FALSE);
+				if (!$component || !$component instanceof BaseControl) {
+					continue;
+				}
+				$this->originalEntityData[$name] = $currentValue;
+				$component->setDefaultValue($currentValue);
+				$component->setValue($currentValue);
+			}
+		}
 	}
 
 }
