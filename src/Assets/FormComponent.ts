@@ -9,7 +9,8 @@ import 'jquery-datetimepicker/build/jquery.datetimepicker.full';
 import 'jquery-datetimepicker/build/jquery.datetimepicker.min.css';
 import 'select2/dist/js/select2';
 import 'select2/dist/css/select2.css';
-
+import './colorPicker/js/bootstrap-colorpicker.min.js'
+import './colorPicker/css/bootstrap-colorpicker.min.css'
 
 import {App, BaseComponent, SAGA_CLICK_AJAX_REQUEST_STARTED, SAGA_REDRAW_SNIPPET, AjaxOptions, Saga, addSagasParameter} from "Stage"
 
@@ -55,12 +56,11 @@ class FormComponent extends BaseComponent {
 			$(form).find(':input').each(function () {
 				let input = this;
 				if ($.inArray($(this).prop('name'), ['send', '_do']) < 0) {
-					// local.addInputListeners(input)
 					the.installInputListener(input);
 				}
 			});
 		});
-
+		$(target).find('.colorPicker').colorpicker();
 		$(target).find('input').not(".ignore-iCheck").iCheck({
 			checkboxClass: 'icheckbox_square-purple',
 			radioClass: 'iradio_square-purple',
