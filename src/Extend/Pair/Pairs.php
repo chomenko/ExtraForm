@@ -166,10 +166,7 @@ class Pairs extends EntityExtend implements IPairs
 
 			$labelItem = $pattern;
 			$origin = $this->getForm()->getUnitOfWork()->getOriginalEntityData($item);
-
-			if (!array_key_exists($identifier, $origin)) {
-				throw Exception::emptyIdentifier(get_class($item));
-			}
+			$identifierValue = $this->getIdentifierValue($identifier, $item);
 
 			foreach ($patternsKeys as $i => $key) {
 				if (!array_key_exists($key["name"], $origin)) {
@@ -186,9 +183,42 @@ class Pairs extends EntityExtend implements IPairs
 			foreach ($patternsKeys as $key) {
 				$labelItem = str_replace($key["search"], $key["translate"], $labelItem);
 			}
-			$list[$origin[$identifier]] = $labelItem;
+			$list[$identifierValue] = $labelItem;
 		}
 		return $list;
+	}
+
+	/**
+	 * @param $identifierName
+	 * @param mixed $item
+	 * @return mixed|null
+	 * @throws Exception
+	 * @throws \ReflectionException
+	 */
+	private function getIdentifierValue($identifierName, $item)
+	{
+		$origin = $this->getForm()->getUnitOfWork()->getOriginalEntityData($item);
+		$className = $this->getForm()->getEntityManager()->getClassMetadata(get_class($item))->getName();
+
+		$identifierValue = NULL;
+		if (!array_key_exists($identifierName, $origin) ) {
+			if (is_object($item)) {
+				$ref = new \ReflectionClass($className);
+				if ($ref->hasProperty($identifierName)) {
+					$prop = $ref->getProperty($identifierName);
+					$prop->setAccessible(TRUE);
+					$identifierValue = $prop->getValue($item);
+				}
+			}
+		} else{
+			$identifierValue = $origin[$identifierName];
+		}
+
+		if (!$identifierValue) {
+			throw Exception::emptyIdentifier(get_class($item));
+		}
+
+		return $identifierValue;
 	}
 
 	/**
@@ -232,11 +262,8 @@ class Pairs extends EntityExtend implements IPairs
 			$items = $values;
 			return;
 		}
-
-		$data = $this->entityManager->getUnitOfWork()->getOriginalEntityData($items);
-		if (array_key_exists($identifier, $data)) {
-			$items = $data[$identifier];
-		}
+		$identifierValue = $this->getIdentifierValue($identifier, $items);
+		$items = $identifierValue;
 	}
 
 	/**
