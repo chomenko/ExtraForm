@@ -6,11 +6,11 @@
 
 namespace Chomenko\ExtraForm\DI;
 
+use Chomenko\ExtraForm\Extend\ChangeSet;
 use Chomenko\ExtraForm\Extend\Date\DateEvent;
 use Chomenko\ExtraForm\Extend\Pair\PairEvent;
 use Chomenko\ExtraForm\FormEvents;
 use Chomenko\ExtraForm\FormFactory;
-use Chomenko\ExtraForm\Validator\Constraints\UniqueEntity;
 use Chomenko\ExtraForm\Validator\Constraints\UniqueEntityValidator;
 use Nette\Configurator;
 use Nette\DI\Compiler;
@@ -26,7 +26,8 @@ class ExtraFormExtension extends CompilerExtension
 	 */
 	private $defaultEvents = [
 		PairEvent::class,
-		DateEvent::class
+		DateEvent::class,
+		ChangeSet::class,
 	];
 
 	public function loadConfiguration()
