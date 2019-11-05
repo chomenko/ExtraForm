@@ -53,6 +53,11 @@ class ExtraForm extends Form
 	private $validator;
 
 	/**
+	 * @var array|null
+	 */
+	protected $captchaConfig;
+
+	/**
 	 * @param IContainer|null $parent
 	 * @param string|null $name
 	 * @param FormEvents|null $formEvents
@@ -154,11 +159,12 @@ class ExtraForm extends Form
 		if (!$this->isSubmitted()) {
 			return;
 
-		} elseif (!$this->getErrors()) {
-			$this->validate();
 		}
 
 		if ($this->hasOnlyValidation()) {
+			if (!$this->getErrors()) {
+				$this->validate();
+			}
 			if (!$this->getPresenter()->isAjax()) {
 				return;
 			}
@@ -495,6 +501,16 @@ class ExtraForm extends Form
 	public function addHidden($name, $default = NULL)
 	{
 		$component = new Controls\HiddenField($default);
+		$this->addComponent($component, $name);
+		$component->installed($this);
+		return $component;
+	}
+	
+	
+	public function addRecaptcha($name, string $domainKey, string $secretKey, ?int $tryCount = 5, bool $enable = true)
+	{
+		$component = new Controls\Recaptcha($domainKey, $secretKey, $tryCount, $enable);
+		$component->setRequired(FALSE);
 		$this->addComponent($component, $name);
 		$component->installed($this);
 		return $component;
