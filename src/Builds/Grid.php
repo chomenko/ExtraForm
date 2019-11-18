@@ -76,4 +76,15 @@ trait Grid
 		return $this->child[] = $child;
 	}
 
+	/**
+	 * @param array $attr
+	 * @return Builder
+	 */
+	public function addDiv(array $attr = [])
+	{
+		$wrapped = Html::el('div', $attr);
+		$child = new Builder($this->render, $this, $wrapped);
+		return $this->child[] = $child;
+	}
+
 }

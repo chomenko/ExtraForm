@@ -203,7 +203,11 @@ trait Button
 			$el->addHtml(Html::el('i')->setAttribute('class', $attrClass));
 			$el->addHtml('&nbsp;');
 		}
-		$el->addHtml($this->translate($caption === NULL ? $this->caption : $caption));
+
+		$content = $this->translate($caption === NULL ? $this->caption : $caption);
+		if ($content) {
+			$el->addHtml($content);
+		}
 		foreach ($this->afterIcons as $attrClass) {
 			$el->addHtml('&nbsp;');
 			$el->addHtml(Html::el('i')->setAttribute('class', $attrClass));
