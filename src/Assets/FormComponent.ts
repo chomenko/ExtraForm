@@ -81,14 +81,22 @@ class FormComponent extends BaseComponent {
 	{
 		const the = this;
 		let timeout;
-		$(el).on('keydown', function () {
+		$(el).on('keydown', (e) => {
+			let form = $(e.target).closest("form");
+
+			if(e.which == 13) {
+				e.preventDefault();
+				this.sendForm(form);
+				return;
+			}
+
 			if (the.state.validated) {
 				the.state.validated = false;
 				return;
 			}
-			let fieldName = $(this)[0].name;
+			let fieldName = $(e.target)[0].name;
 
-			let form = $(this).closest("form");
+
 			if (the.hasHtmlErrors(form, fieldName)) {
 				clearTimeout(timeout);
 				timeout = setTimeout(function () {
@@ -110,9 +118,34 @@ class FormComponent extends BaseComponent {
 			the.validateForm(form, fieldName);
 
 			the.state.validated = true;
-		})
+		});
 
+		if ($(el).hasClass("changeSend")) {
+			$(el).on('change', function () {
+
+				let form = $(this).closest("form");
+				const formData = new FormData(form[0]);
+				let defaultOption = AjaxOptions({
+					url: form[0].action,
+					type: 'POST',
+					data: formData,
+				});
+				$.ajax(defaultOption);
+			});
+		}
 	}
+
+	private sendForm(form) {
+		const formData = new FormData(form[0]);
+		console.log(form[0]);
+		let defaultOption = AjaxOptions({
+			url: form[0].action,
+			type: 'POST',
+			data: formData,
+		});
+		$.ajax(defaultOption);
+	}
+
 	@Saga('validate_saga')
 	private validateSaga(action) {
 		const {payload} = action;
